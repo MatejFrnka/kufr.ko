@@ -1,0 +1,52 @@
+User
+	Id
+	Name
+	Email
+	Password
+	Created
+	LastOnline
+	Token
+	Id_Attachment
+
+Group
+	Id
+	GroupName
+	Type
+	Id_Attachment
+
+Group_User
+	Id_User
+	Id_Group
+	State
+	Nickname
+	Permission
+
+
+Message
+	Id
+	Id_User
+	Id_Group
+	TextBody
+	Id_Atteachment
+
+MessageHistory
+	Id
+	Id_Message
+	ByteBody
+	TextBody	
+	ChangedTime
+
+MessageState
+	Id_Message
+	Id_User
+	State
+	
+FriendRequest
+	Id_UserSender
+	Id_UserReciever
+	State = "request" "ignore" "blocked" "accepted" "declined"
+
+Attachment
+	Id
+	Path
+	Mime
