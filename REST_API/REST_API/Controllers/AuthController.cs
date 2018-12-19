@@ -11,11 +11,13 @@ namespace REST_API.Controllers
 {
     public class AuthController : ApiController
     {
+        [HttpPost]
         public Response Login([FromBody]UserCredentials user)
         {
             return new Response();
         }
 
+        [HttpPost]
         public Response Register([FromBody]UserCredentials user)
         {
             return new Response();
