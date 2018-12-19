@@ -1,4 +1,5 @@
-﻿using System;
+﻿using REST_API.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -10,15 +11,16 @@ namespace REST_API.Controllers
     public class ValuesController : ApiController
     {
         // GET api/values
-        public IEnumerable<string> Get()
+        [HttpGet]
+        public IEnumerable<string> Seen()
         {
             return new string[] { "value1", "value2" };
         }
 
         // GET api/values/5
-        public string Get(int id)
+        public Test Get(int id)
         {
-            return "value";
+            return new Test() { Id = 1, Name = "aaa" } ;
         }
 
         // POST api/values
