@@ -203,6 +203,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\Api\Auth\TokenData.cs" />
     <Compile Include="Models\Api\Auth\UserCredentials.cs" />
     <Compile Include="Models\Api\IResponseData.cs" />
     <Compile Include="Models\Api\IRequestType.cs" />
@@ -213,9 +214,16 @@
     <Compile Include="Models\Api\Message\SendMessage.cs" />
     <Compile Include="Models\Api\Request.cs" />
     <Compile Include="Models\Api\Response.cs" />
+    <Compile Include="Models\Database\Token.cs" />
+    <Compile Include="Models\Database\User.cs" />
+    <Compile Include="Models\Enums\StatusCode.cs" />
+    <Compile Include="Models\Enums\Visibility.cs" />
+    <Compile Include="Repositories\TokenRepository.cs" />
+    <Compile Include="Repositories\UserRepository.cs" />
     <Compile Include="Utilities\DbManager.cs" />
     <Compile Include="Models\Test.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utilities\HashUtility.cs" />
     <Compile Include="Utilities\JsonSerializationUtility.cs" />
     <Compile Include="Utilities\SettingsSerializationBinder.cs" />
   </ItemGroup>
@@ -275,8 +283,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Models\Database\" />
-    <Folder Include="Repositories\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
