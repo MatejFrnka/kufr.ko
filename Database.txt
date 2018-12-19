@@ -5,9 +5,14 @@ User
 	Password
 	Created
 	LastOnline
-	Token
 	Id_Attachment
 
+Token
+	Id
+	Id_User
+	Token
+	ExpireDate
+		
 Group
 	Id
 	GroupName
@@ -21,19 +26,17 @@ Group_User
 	Nickname
 	Permission
 
-
 Message
 	Id
 	Id_User
 	Id_Group
 	TextBody
-	Id_Atteachment
 
 MessageHistory
 	Id
 	Id_Message
-	ByteBody
-	TextBody	
+	Id_Attachment
+	TextBody
 	ChangedTime
 
 MessageState
@@ -44,9 +47,12 @@ MessageState
 FriendRequest
 	Id_UserSender
 	Id_UserReciever
-	State = "request" "ignore" "blocked" "accepted" "declined"
+	State
 
 Attachment
 	Id
 	Path
 	Mime
+Message_Attachment
+	Id_Message
+	Id_Attachment
