@@ -41,10 +41,15 @@ namespace REST_API.Controllers
 
         }
         [HttpPost]
+        public void GetMessageHistory()
+        {
+            
+        }
+        [HttpPost]
         public Response GetMessages(GetMessage getMessage)
         {
             List<SingleMessage> messages = repository.GetMessages(getMessage.StartId, getMessage.Amount, getMessage.Id_Group);
-            return new Response() { StatusCode = Models.Enums.StatusCode.OK, Data = new ReturnMessages() { Messages = messages } };
+            return new Response() { StatusCode = Models.Enums.StatusCode.OK, Data = messages};
         }
         [HttpPost]
         public Response SetMessageState(SetMessageState setMessageState)

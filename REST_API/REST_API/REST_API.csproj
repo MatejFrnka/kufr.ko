@@ -205,10 +205,8 @@
     </Compile>
     <Compile Include="Models\Api\Auth\TokenData.cs" />
     <Compile Include="Models\Api\Auth\UserCredentials.cs" />
-    <Compile Include="Models\Api\IResponseData.cs" />
     <Compile Include="Models\Api\Message\EditMessage.cs" />
     <Compile Include="Models\Api\Message\GetMessage.cs" />
-    <Compile Include="Models\Api\Message\ReturnMessages.cs" />
     <Compile Include="Models\Api\Message\SetMessageState.cs" />
     <Compile Include="Models\Api\Message\SingleMessage.cs" />
     <Compile Include="Models\Api\Message\SendMessage.cs" />
