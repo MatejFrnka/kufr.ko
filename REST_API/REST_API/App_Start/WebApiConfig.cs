@@ -1,4 +1,5 @@
-﻿using System;
+﻿using REST_API.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
@@ -22,6 +23,7 @@ namespace REST_API
             );
 
             config.Formatters.JsonFormatter.SupportedMediaTypes.Add(new MediaTypeHeaderValue("text/html"));
+            config.Formatters.JsonFormatter.SerializerSettings.SerializationBinder = JsonSerializationUtility.jsonSettings.SerializationBinder;
         }
     }
 }

@@ -209,6 +209,7 @@
     <Compile Include="Models\Api\IRequestType.cs" />
     <Compile Include="Models\Api\Message\EditMessage.cs" />
     <Compile Include="Models\Api\Message\GetMessage.cs" />
+    <Compile Include="Models\Api\Message\ReturnMessages.cs" />
     <Compile Include="Models\Api\Message\SetMessageState.cs" />
     <Compile Include="Models\Api\Message\SingleMessage.cs" />
     <Compile Include="Models\Api\Message\SendMessage.cs" />
@@ -218,6 +219,7 @@
     <Compile Include="Models\Database\User.cs" />
     <Compile Include="Models\Enums\StatusCode.cs" />
     <Compile Include="Models\Enums\Visibility.cs" />
+    <Compile Include="Repositories\MessageRepository.cs" />
     <Compile Include="Repositories\TokenRepository.cs" />
     <Compile Include="Repositories\UserRepository.cs" />
     <Compile Include="Utilities\DbManager.cs" />

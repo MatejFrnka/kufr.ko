@@ -5,10 +5,8 @@ using System.Web;
 
 namespace REST_API.Models.Api.Message
 {
-    public class SetMessageState : IRequestType
+    public class ReturnMessages : IResponseData
     {
-        public int Id_Message { get; set; }
-        public bool Seen { get; set; }
-
+        public List<SingleMessage> Messages { get; set; }
     }
 }

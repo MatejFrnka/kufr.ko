@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Serialization;
+using REST_API.Models.Api.Message;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +20,14 @@ namespace REST_API.Utilities
             switch (typeName)
             {
                 //MessageController
-
+                case "EditMessage":
+                    return typeof(EditMessage);
+                case "GetMessage":
+                    return typeof(GetMessage);
+                case "SendMessage":
+                    return typeof(SendMessage);
+                case "SetMessageState":
+                    return typeof(SetMessageState);
             }
             return null;
         }

@@ -11,5 +11,6 @@ namespace REST_API.Models.Api.Message
         public int[] Id_Attachment { get; set; }
         public int Id_Group { get; set; }
         public int Id_UserSender { get; set; }
+        public DateTime Sent { get; set; }
     }
 }
