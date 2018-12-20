@@ -15,16 +15,16 @@ namespace REST_API.Repositories
         {
             db = dbManager;
         }
-        public void SendMessage(uint Id_Sender, SendMessage message)
+        public ulong SendMessage(ulong Id_Sender, SendMessage message)
         {
             string sql = "INSERT INTO `Message`(`Id_User`, `Id_Group`, `Sent`, `TextBody`) VALUES (@Id_Sender, @Id_Group, @Sent, @Text);" +
                             "SELECT LAST_INSERT_ID();";
 
             MySqlDataReader reader = db.ExecuteReader(sql, new Dictionary<string, object>() { { "Id_Sender", Id_Sender }, { "Id_Group", message.Id_Group }, { "Sent", DateTime.Now }, { "Text", message.Text } });
-            uint Id_Message;
+            ulong Id_Message;
             if (reader.Read())
             {
-                Id_Message = reader.GetUInt32("LAST_INSERT_ID()");
+                Id_Message = reader.GetUInt64("LAST_INSERT_ID()");
             }
             else
             {
@@ -37,8 +37,9 @@ namespace REST_API.Repositories
             {
                 db.ExecuteNonQuery(sql, new Dictionary<string, object>() { { "Id_Message", Id_Message }, { "Id_Attachment", Attachment } });
             }
+            return Id_Message;
         }
-        public void SetMessageState(int Id_Sender, SetMessageState messageState)
+        public void SetMessageState(ulong Id_Sender, SetMessageState messageState)
         {
             string sql;
             sql = "SELECT * FROM `MessageState` WHERE `Id_Message` = @Id_Message and `Id_User` = @Id_User";
@@ -74,6 +75,7 @@ namespace REST_API.Repositories
             List<SingleMessage> result = ReadToSingleMessage(db.ExecuteReader(sql, new Dictionary<string, object>() { { "Id_Group", Id_Group }, { "StartId", StartMessageId }, { "Length", Length } }));
             return result;
         }
+        //IMPORTANT: MySqlDataReader has to be ordered by Message.Id!
         private List<SingleMessage> ReadToSingleMessage(MySqlDataReader reader)
         {
             List<SingleMessage> result = new List<SingleMessage>();
