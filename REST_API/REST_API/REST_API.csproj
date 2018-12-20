@@ -207,6 +207,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\Api\Auth\UserCredentials.cs" />
+    <Compile Include="Models\Api\Group\GroupInfo.cs" />
     <Compile Include="Models\Api\Message\EditMessage.cs" />
     <Compile Include="Models\Api\Message\GetMessage.cs" />
     <Compile Include="Models\Api\Message\SetMessageState.cs" />
@@ -223,6 +224,7 @@
     <Compile Include="Models\Enums\Permission.cs" />
     <Compile Include="Models\Enums\StatusCode.cs" />
     <Compile Include="Models\Enums\Visibility.cs" />
+    <Compile Include="Repositories\GroupRepository.cs" />
     <Compile Include="Repositories\MessageRepository.cs" />
     <Compile Include="Repositories\TokenRepository.cs" />
     <Compile Include="Repositories\FriendRepository.cs" />
@@ -290,7 +292,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Models\Api\Group\" />
     <Folder Include="Models\Api\Users\" />
   </ItemGroup>
   <ItemGroup>
