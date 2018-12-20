@@ -5,7 +5,7 @@ using System.Web;
 
 namespace REST_API.Models.Api.Auth
 {
-    public class TokenData : IResponseData
+    public class TokenData
     {
         public string Token { get; set; }
     }

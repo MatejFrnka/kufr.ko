@@ -28,17 +28,12 @@ namespace REST_API.Controllers
         //    return result;
         //}
         [HttpPost]
-        public Response SendMessage(Request request)
+        public Response SendMessage(SendMessage sendMessage)
         {
-            if (request.RequestType is SendMessage)
-            {
-                repository.SendMessage(request.Id_User, (SendMessage)request.RequestType);
-                return new Response() { StatusCode = Models.Enums.StatusCode.OK };
-            }
-            else
-            {
-                return new Response() { StatusCode = Models.Enums.StatusCode.INVALID_REQUEST };
-            }
+            //test
+            int Id_User = 1;
+            repository.SendMessage(Id_User, sendMessage);
+            return new Response() { StatusCode = Models.Enums.StatusCode.OK };
         }
         [HttpPost]
         public void EditMessage(EditMessage editMessage)
@@ -46,23 +41,21 @@ namespace REST_API.Controllers
 
         }
         [HttpPost]
-        public Response GetMessages(GetMessage getMessage)
+        public void GetMessageHistory()
         {
-            return null;
+            
         }
         [HttpPost]
-        public Response SetMessageState(Request request)
+        public Response GetMessages(GetMessage getMessage)
         {
-            request.RequestType = new SetMessageState() {Id_Message = 1, Seen = false };
-
-            if (request.RequestType is SetMessageState)
-            {
-                repository.SetMessageState(request.Id_User, (SetMessageState)request.RequestType);
-            }
-            else
-            {
-                return new Response() { StatusCode = Models.Enums.StatusCode.INVALID_REQUEST };
-            }
+            List<SingleMessage> messages = repository.GetMessages(getMessage.StartId, getMessage.Amount, getMessage.Id_Group);
+            return new Response() { StatusCode = Models.Enums.StatusCode.OK, Data = messages};
+        }
+        [HttpPost]
+        public Response SetMessageState(SetMessageState setMessageState)
+        {
+            int Id_User = 1;
+            repository.SetMessageState(Id_User, setMessageState);
             return new Response() { StatusCode = Models.Enums.StatusCode.OK };
         }
     }

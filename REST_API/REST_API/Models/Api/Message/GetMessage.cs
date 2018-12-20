@@ -5,11 +5,11 @@ using System.Web;
 
 namespace REST_API.Models.Api.Message
 {
-    public class GetMessage : IRequestType
+    public class GetMessage
     {
-        public int Id_Group { get; set; }
+        public uint Id_Group { get; set; }
         //0 = newest message
-        public int PaginationStart { get; set; }
-        public int PaginationAmount { get; set; }
+        public uint StartId { get; set; }
+        public uint Amount { get; set; }
     }
 }
