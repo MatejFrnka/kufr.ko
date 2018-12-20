@@ -37,7 +37,7 @@ namespace REST_API.Controllers
                 return new Response() { StatusCode = Models.Enums.StatusCode.INVALID_REQUEST };
 
             User dbUser;
-
+            
             try
             {
                 dbUser = this.userRepository.FindByEmail(user.Email);
@@ -65,7 +65,7 @@ namespace REST_API.Controllers
                 return new Response() { StatusCode = Models.Enums.StatusCode.DATABASE_ERROR };
             }
 
-            return new Response() { StatusCode = Models.Enums.StatusCode.OK, Data = new TokenData() { Token = token.Value } };
+            return new Response() { StatusCode = Models.Enums.StatusCode.OK, Data = token.Value };
         }
 
         [HttpPost]
