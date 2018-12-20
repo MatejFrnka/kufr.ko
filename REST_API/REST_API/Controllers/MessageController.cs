@@ -10,9 +10,11 @@ using REST_API.Models.Api.Message;
 using REST_API.Repositories;
 using REST_API.Utilities;
 using REST_API.Models.Enums;
+using REST_API.Authentication;
 
 namespace REST_API.Controllers
 {
+    [UserAuth]
     public class MessageController : ApiController
     {
         MessageRepository repository = new MessageRepository(new DbManager());
@@ -30,8 +32,9 @@ namespace REST_API.Controllers
         [HttpPost]
         public Response SendMessage(SendMessage sendMessage)
         {
+            
             //test
-            int Id_User = 1;
+            int Id_User = ((UserPrincipal)User).DbUser.Id;
             repository.SendMessage(Id_User, sendMessage);
             return new Response() { StatusCode = Models.Enums.StatusCode.OK };
         }
@@ -54,7 +57,7 @@ namespace REST_API.Controllers
         [HttpPost]
         public Response SetMessageState(SetMessageState setMessageState)
         {
-            int Id_User = 1;
+            int Id_User = ((UserPrincipal)User).DbUser.Id;
             repository.SetMessageState(Id_User, setMessageState);
             return new Response() { StatusCode = Models.Enums.StatusCode.OK };
         }
