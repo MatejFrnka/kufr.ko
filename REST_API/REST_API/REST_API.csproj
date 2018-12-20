@@ -161,9 +161,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Authentication\AuthFailResponse.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Authentication\UserAuthAttribute.cs" />
+    <Compile Include="Authentication\UserPrincipal.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Areas\HelpPage\ApiDescriptionExtensions.cs" />
     <Compile Include="Areas\HelpPage\App_Start\HelpPageConfig.cs" />
@@ -205,15 +208,11 @@
     </Compile>
     <Compile Include="Models\Api\Auth\TokenData.cs" />
     <Compile Include="Models\Api\Auth\UserCredentials.cs" />
-    <Compile Include="Models\Api\IResponseData.cs" />
-    <Compile Include="Models\Api\IRequestType.cs" />
     <Compile Include="Models\Api\Message\EditMessage.cs" />
     <Compile Include="Models\Api\Message\GetMessage.cs" />
-    <Compile Include="Models\Api\Message\ReturnMessages.cs" />
     <Compile Include="Models\Api\Message\SetMessageState.cs" />
     <Compile Include="Models\Api\Message\SingleMessage.cs" />
     <Compile Include="Models\Api\Message\SendMessage.cs" />
-    <Compile Include="Models\Api\Request.cs" />
     <Compile Include="Models\Api\Response.cs" />
     <Compile Include="Models\Database\FriendRequest.cs" />
     <Compile Include="Models\Database\Token.cs" />

@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using MySql.Data.MySqlClient;
+using REST_API.Authentication;
 using REST_API.Models.Api;
 using REST_API.Models.Api.Auth;
 using REST_API.Models.Database;

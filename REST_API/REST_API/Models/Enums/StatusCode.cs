@@ -4,6 +4,9 @@
     {
         OK,
         INVALID_REQUEST,
+        TOKEN_INVALID,
+        TOKEN_INACTIVE,
+        TOKEN_EXPIRED,
         DATABASE_ERROR,
         INVALID_EMAIL,
         INVALID_PASSWORD,

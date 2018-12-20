@@ -39,6 +39,10 @@ namespace REST_API.Repositories
             this.db.ExecuteNonQuery(sql, new Dictionary<string, object>() { {"name",user.Name },{"email",user.Email },{ "pass", user.Password } });
         }
 
+        public void UpdateLastOnline(int id)
+        {
+            this.db.ExecuteNonQuery("UPDATE User SET LastOnline = NOW() WHERE Id = @id", new Dictionary<string, object>() { { "id", id } });
+        }
         private List<User> ReadToList(MySqlDataReader reader)
         {
             List<User> result = new List<User>();
