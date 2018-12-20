@@ -15,16 +15,16 @@ namespace REST_API.Repositories
         {
             db = dbManager;
         }
-        public void SendMessage(int Id_Sender, SendMessage message)
+        public void SendMessage(uint Id_Sender, SendMessage message)
         {
             string sql = "INSERT INTO `Message`(`Id_User`, `Id_Group`, `Sent`, `TextBody`) VALUES (@Id_Sender, @Id_Group, @Sent, @Text);" +
                             "SELECT LAST_INSERT_ID();";
 
             MySqlDataReader reader = db.ExecuteReader(sql, new Dictionary<string, object>() { { "Id_Sender", Id_Sender }, { "Id_Group", message.Id_Group }, { "Sent", DateTime.Now }, { "Text", message.Text } });
-            int Id_Message;
+            uint Id_Message;
             if (reader.Read())
             {
-                Id_Message = reader.GetInt32("LAST_INSERT_ID()");
+                Id_Message = reader.GetUInt32("LAST_INSERT_ID()");
             }
             else
             {
