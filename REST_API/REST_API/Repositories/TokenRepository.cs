@@ -17,7 +17,7 @@ namespace REST_API.Repositories
             this.db = dbManager;
         }
 
-        public Token FindById(int id)
+        public Token FindById(uint id)
         {
             List<Token> result = this.ReadToList(this.db.ExecuteReader("SELECT * FROM Token WHERE Id = @id", new Dictionary<string, object>() { { "id", id } }));
 
@@ -46,8 +46,8 @@ namespace REST_API.Repositories
             {
                 Token token = new Token()
                 {
-                    Id = reader.GetInt32("Id"),
-                    Id_User = reader.GetInt32("Id_User"),
+                    Id = reader.GetUInt32("Id"),
+                    Id_User = reader.GetUInt32("Id_User"),
                     Value = reader.GetString("Token"),
                     ExpireDate = reader.GetDateTime("ExpireDate"),
                     Active = reader.GetBoolean("Active")

@@ -214,12 +214,15 @@
     <Compile Include="Models\Api\Message\SingleMessage.cs" />
     <Compile Include="Models\Api\Message\SendMessage.cs" />
     <Compile Include="Models\Api\Response.cs" />
+    <Compile Include="Models\Database\FriendRequest.cs" />
     <Compile Include="Models\Database\Token.cs" />
     <Compile Include="Models\Database\User.cs" />
+    <Compile Include="Models\Enums\FriendRequestState.cs" />
     <Compile Include="Models\Enums\StatusCode.cs" />
     <Compile Include="Models\Enums\Visibility.cs" />
     <Compile Include="Repositories\MessageRepository.cs" />
     <Compile Include="Repositories\TokenRepository.cs" />
+    <Compile Include="Repositories\FriendRepository.cs" />
     <Compile Include="Repositories\UserRepository.cs" />
     <Compile Include="Utilities\DbManager.cs" />
     <Compile Include="Models\Test.cs" />
@@ -284,6 +287,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Models\Api\Users\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />

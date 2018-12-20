@@ -18,7 +18,7 @@ namespace REST_API.Repositories
             this.db = dbManager;
         }
 
-        public User FindById(int id)
+        public User FindById(uint id)
         {
             List<User> result = this.ReadToList(this.db.ExecuteReader("SELECT * FROM User WHERE Id = @id", new Dictionary<string, object>() { { "id", id } }));
             
@@ -39,7 +39,7 @@ namespace REST_API.Repositories
             this.db.ExecuteNonQuery(sql, new Dictionary<string, object>() { {"name",user.Name },{"email",user.Email },{ "pass", user.Password } });
         }
 
-        public void UpdateLastOnline(int id)
+        public void UpdateLastOnline(uint id)
         {
             this.db.ExecuteNonQuery("UPDATE User SET LastOnline = NOW() WHERE Id = @id", new Dictionary<string, object>() { { "id", id } });
         }
@@ -51,14 +51,14 @@ namespace REST_API.Repositories
             {
                 User user = new User()
                 {
-                    Id = reader.GetInt32("Id"),
+                    Id = reader.GetUInt32("Id"),
                     Name = reader.GetString("Name"),
                     Email = reader.GetString("Email"),
                     Password = reader.GetString("Password"),
                     Created = reader.GetDateTime("Created"),
                     LastOnline = reader.IsDBNull(reader.GetOrdinal("LastOnline")) ? (DateTime?)null : reader.GetDateTime("LastOnline"),
                     Visibility = (Visibility)Enum.Parse(typeof(Visibility), reader.GetString("Visibility")),
-                    Id_Attachment = reader.GetInt32("Id_Attachment")
+                    Id_Attachment = reader.GetUInt32("Id_Attachment")
                 };
 
                 result.Add(user);
