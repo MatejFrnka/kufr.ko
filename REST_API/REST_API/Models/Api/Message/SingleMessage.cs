@@ -7,6 +7,8 @@ namespace REST_API.Models.Api.Message
 {
     public class SingleMessage
     {
+        public int Id { get; set; }
+        public bool Edited { get; set; }
         public string Text { get; set; }
         public List<uint> Id_Attachment { get; set; }
         public uint Id_Group { get; set; }

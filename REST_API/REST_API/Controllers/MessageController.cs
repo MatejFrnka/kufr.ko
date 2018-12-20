@@ -29,14 +29,19 @@ namespace REST_API.Controllers
         //    Debug.WriteLine(result);
         //    return result;
         //}
+
+        /// <summary>
+        /// Adds a message to target group.
+        /// </summary>
+        /// <param name="sendMessage"><see cref="Models.Api.Message.SendMessage"/></param>
+        /// <returns>Returns <see cref="Models.Enums.StatusCode"/> and Id of the message.</returns>
         [HttpPost]
         public Response SendMessage(SendMessage sendMessage)
         {
-            
             //test
-            int Id_User = ((UserPrincipal)User).DbUser.Id;
-            repository.SendMessage(Id_User, sendMessage);
-            return new Response() { StatusCode = Models.Enums.StatusCode.OK };
+            ulong Id_User = ((UserPrincipal)User).DbUser.Id;
+            ulong MessageId = repository.SendMessage(Id_User, sendMessage);
+            return new Response() { StatusCode = Models.Enums.StatusCode.OK, Data = MessageId };
         }
         [HttpPost]
         public void EditMessage(EditMessage editMessage)
@@ -46,18 +51,23 @@ namespace REST_API.Controllers
         [HttpPost]
         public void GetMessageHistory()
         {
-            
+
         }
+        /// <summary>
+        /// Returns messages.
+        /// </summary>
+        /// <param name="getMessage"><see cref="Models.Api.Message.GetMessage"/></param>
+        /// <returns>Returns a <see cref="Models.Enums.StatusCode"/></returns>
         [HttpPost]
         public Response GetMessages(GetMessage getMessage)
         {
             List<SingleMessage> messages = repository.GetMessages(getMessage.StartId, getMessage.Amount, getMessage.Id_Group);
-            return new Response() { StatusCode = Models.Enums.StatusCode.OK, Data = messages};
+            return new Response() { StatusCode = Models.Enums.StatusCode.OK, Data = messages };
         }
         [HttpPost]
         public Response SetMessageState(SetMessageState setMessageState)
         {
-            int Id_User = ((UserPrincipal)User).DbUser.Id;
+            ulong Id_User = ((UserPrincipal)User).DbUser.Id;
             repository.SetMessageState(Id_User, setMessageState);
             return new Response() { StatusCode = Models.Enums.StatusCode.OK };
         }
