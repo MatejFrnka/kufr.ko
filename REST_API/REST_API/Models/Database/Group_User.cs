@@ -1,4 +1,5 @@
-﻿using REST_API.Models.Enums;
+﻿using MySql.Data.MySqlClient;
+using REST_API.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;

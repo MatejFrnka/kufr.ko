@@ -11,6 +11,6 @@ namespace REST_API.Controllers
     [UserAuth]
     public class GroupController : ApiController
     {
-        public 
+        
     }
 }

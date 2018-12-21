@@ -11,47 +11,118 @@ using REST_API.Repositories;
 using REST_API.Utilities;
 using REST_API.Models.Enums;
 using REST_API.Authentication;
+using REST_API.Models.Database;
 
 namespace REST_API.Controllers
 {
     [UserAuth]
     public class MessageController : ApiController
     {
-        MessageRepository repository = new MessageRepository(new DbManager());
-        //[HttpGet]
-        //public string test()
-        //{
-        //    Request r = new Request() { Id_User = 1, Token = "test"};
-        //    SendMessage s = new SendMessage() { Id_Group = 1, Text = "karel" };
-        //    s.Id_Attachment = new int[] { 1,3 };
-        //    r.RequestType = s;
-        //    string result = JsonSerializationUtility.Serialize(r);
-        //    Debug.WriteLine(result);
-        //    return result;
-        //}
 
+        MessageRepository repository = new MessageRepository(new DbManager());
+        UserRepository userRepository = new UserRepository(new DbManager());
+        [HttpPost]
+        public void test()
+        {
+            List<SetMessageState> d = new List<SetMessageState>() { new Models.Api.Message.SetMessageState() { Id_Message = 12, Seen = false } };
+            Debug.WriteLine(JsonSerializationUtility.Serialize(d));
+            return;
+        }
         /// <summary>
         /// Adds a message to target group.
         /// </summary>
         /// <param name="sendMessage"><see cref="Models.Api.Message.SendMessage"/></param>
-        /// <returns>Returns <see cref="Models.Enums.StatusCode"/> and Id of the message.</returns>
+        /// <returns>Returns <see cref="Models.Enums.StatusCode"/> and ulong Id of the message.</returns>
         [HttpPost]
         public Response SendMessage(SendMessage sendMessage)
         {
-            //test
-            ulong Id_User = ((UserPrincipal)User).DbUser.Id;
-            ulong MessageId = repository.SendMessage(Id_User, sendMessage);
-            return new Response() { StatusCode = Models.Enums.StatusCode.OK, Data = MessageId };
+            if (sendMessage == null || sendMessage.Id_Group == 0)
+            {
+                return new Response() { StatusCode = Models.Enums.StatusCode.INVALID_REQUEST };
+            }
+            else
+            {
+                uint Id_User = ((UserPrincipal)User).DbUser.Id;
+
+                if (!InGroup(Id_User, sendMessage.Id_Group))
+                {
+                    return new Response() { StatusCode = Models.Enums.StatusCode.FORBIDDEN };
+                }
+                else
+                {
+                    try
+                    {
+                        ulong MessageId = repository.SendMessage(Id_User, sendMessage);
+                        return new Response() { StatusCode = Models.Enums.StatusCode.OK, Data = MessageId };
+                    }
+                    catch (MySql.Data.MySqlClient.MySqlException ex)
+                    {
+                        return new Response() { StatusCode = Models.Enums.StatusCode.DATABASE_ERROR };
+                        throw ex;
+                    }
+                }
+            }
         }
+
+
+        /// <summary>
+        /// Edits target message. User can only edit its messages.
+        /// </summary>
+        /// <param name="editMessage"><see cref="Models.Api.Message.EditMessage"/></param>
+        /// <returns>Returns a <see cref="StatusCode"/></returns>
         [HttpPost]
-        public void EditMessage(EditMessage editMessage)
+        public Response EditMessage(EditMessage editMessage)
         {
+            uint Id_User = ((UserPrincipal)User).DbUser.Id;
+            Message message = repository.FindById(editMessage.Id_Message);
+            if (editMessage == null || editMessage.Id_Message == 0 || message == null)
+            {
+                return new Response() { StatusCode = Models.Enums.StatusCode.INVALID_REQUEST };
+            }
+            if (message.Id_User != Id_User)
+            {
+                return new Response() { StatusCode = Models.Enums.StatusCode.FORBIDDEN };
+            }
+            try
+            {
+                repository.EditMessage(editMessage);
+                return new Response() { StatusCode = Models.Enums.StatusCode.OK };
+            }
+            catch (MySql.Data.MySqlClient.MySqlException ex)
+            {
+                return new Response() { StatusCode = Models.Enums.StatusCode.DATABASE_ERROR };
+                throw ex;
+            }
 
         }
+        /// <summary>
+        /// Returns a list of edits on a message.
+        /// </summary>
+        /// <param name="Id_Message">ulong Id of target message.</param>
+        /// <returns>Returns a list of edits on a message and a <see cref="StatusCode"/>.</returns>
         [HttpPost]
-        public void GetMessageHistory()
+        public Response GetMessageHistory([FromBody]ulong Id_Message)
         {
-
+            uint Id_User = ((UserPrincipal)User).DbUser.Id;
+            Message message = repository.FindById(Id_Message);
+            if (Id_Message == 0)
+            {
+                return new Response() { StatusCode = Models.Enums.StatusCode.INVALID_REQUEST };
+            }
+            if (!this.InGroup(Id_User,message.Id_Group))
+            {
+                return new Response() { StatusCode = Models.Enums.StatusCode.FORBIDDEN };
+            }
+            try
+            {
+                List<MessageHistory> MessageHistory = repository.GetMessageHistory(Id_Message);
+                return new Response() { StatusCode = Models.Enums.StatusCode.OK, Data = MessageHistory };
+            }
+            catch (MySql.Data.MySqlClient.MySqlException ex)
+            {
+                return new Response() { StatusCode = Models.Enums.StatusCode.DATABASE_ERROR };
+                throw ex;
+            }
         }
         /// <summary>
         /// Returns messages.
@@ -61,15 +132,92 @@ namespace REST_API.Controllers
         [HttpPost]
         public Response GetMessages(GetMessage getMessage)
         {
-            List<SingleMessage> messages = repository.GetMessages(getMessage.StartId, getMessage.Amount, getMessage.Id_Group);
-            return new Response() { StatusCode = Models.Enums.StatusCode.OK, Data = messages };
+            uint Id_User = ((UserPrincipal)User).DbUser.Id;
+
+            if (getMessage == null || getMessage.Id_Group == 0|| getMessage.StartId ==0 || getMessage.Amount == 0)
+            {
+                return new Response() { StatusCode = Models.Enums.StatusCode.INVALID_REQUEST };
+            }
+            if (!this.InGroup(Id_User, getMessage.Id_Group))
+            {
+                return new Response() { StatusCode = Models.Enums.StatusCode.FORBIDDEN };
+            }
+            try
+            {
+                List<SingleMessage> messages = repository.GetMessages(getMessage.StartId, getMessage.Amount, getMessage.Id_Group);
+                return new Response() { StatusCode = Models.Enums.StatusCode.OK, Data = messages };
+            }
+            catch (MySql.Data.MySqlClient.MySqlException ex)
+            {
+                return new Response() { StatusCode = Models.Enums.StatusCode.DATABASE_ERROR };
+                throw ex;
+            }
         }
+        /// <summary>
+        /// Sets a message state to recieved or seen (Seen = false -> recieved, Seen = true -> recieved and seen).
+        /// </summary>
+        /// <param name="setMessageState">List of <see cref="Models.Api.Message.SetMessageState"/></param>
+        /// <returns>Returns a <see cref="Models.Enums.StatusCode"/></returns>
         [HttpPost]
-        public Response SetMessageState(SetMessageState setMessageState)
+        public Response SetMessageState(List<SetMessageState> setMessageState)
         {
-            ulong Id_User = ((UserPrincipal)User).DbUser.Id;
-            repository.SetMessageState(Id_User, setMessageState);
+            uint Id_User = ((UserPrincipal)User).DbUser.Id;
+            if (setMessageState == null || setMessageState.Count == 0)
+            {
+                return new Response() { StatusCode = Models.Enums.StatusCode.INVALID_REQUEST };
+            }
+            foreach (var item in setMessageState)
+            {
+                if(repository.FindById(item.Id_Message).Id_User != Id_User)
+                    return new Response() { StatusCode = Models.Enums.StatusCode.FORBIDDEN };
+            }
+            foreach (var item in setMessageState)
+            {
+                try
+                {
+                    repository.SetMessageState(Id_User, item);
+                }
+                catch (MySql.Data.MySqlClient.MySqlException ex)
+                {
+                    return new Response() { StatusCode = Models.Enums.StatusCode.DATABASE_ERROR };
+                    throw ex;
+                }
+            }
             return new Response() { StatusCode = Models.Enums.StatusCode.OK };
+        }
+        /// <summary>
+        /// Returns new messages.
+        /// </summary>
+        /// <param name="OldestMessageDate">Latest date that the message can be sent.</param>
+        /// <returns>Returns a <see cref="StatusCode"/> and a List of <see cref="SingleMessage"/></returns>
+        [HttpPost]
+        public Response GetNewMessages([FromBody]DateTime OldestMessageDate)
+        {
+            uint Id_User = ((UserPrincipal)User).DbUser.Id;
+            List<uint> Id_Groups = new List<uint>();
+            try
+            {
+                Id_Groups.AddRange(userRepository.GetGroups(Id_User).Select((item) => item.Id_Group));
+                List<SingleMessage> result = repository.GetNewMessages(OldestMessageDate, Id_Groups);
+                return new Response() { StatusCode = Models.Enums.StatusCode.OK, Data = result };
+            }
+            catch (MySql.Data.MySqlClient.MySqlException ex)
+            {
+                return new Response() { StatusCode = Models.Enums.StatusCode.DATABASE_ERROR };
+                throw ex;
+            }
+
+        }
+        private bool InGroup(uint Id_User, uint Id_Group)
+        {
+            foreach (var item in userRepository.GetGroups(Id_User))
+            {
+                if (item.Id_Group == Id_Group)
+                {
+                    return true;
+                }
+            };
+            return false;
         }
     }
 }

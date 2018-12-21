@@ -217,6 +217,8 @@
     <Compile Include="Models\Database\FriendRequest.cs" />
     <Compile Include="Models\Database\Group.cs" />
     <Compile Include="Models\Database\Group_User.cs" />
+    <Compile Include="Models\Database\Message.cs" />
+    <Compile Include="Models\Database\MessageHistory.cs" />
     <Compile Include="Models\Database\Token.cs" />
     <Compile Include="Models\Database\User.cs" />
     <Compile Include="Models\Enums\FriendRequestState.cs" />

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using REST_API.Models.Enums;
+using REST_API.Models.Api;
 
 namespace REST_API.Repositories
 {
@@ -21,10 +22,9 @@ namespace REST_API.Repositories
         public User FindById(uint id)
         {
             List<User> result = this.ReadToList(this.db.ExecuteReader("SELECT * FROM User WHERE Id = @id", new Dictionary<string, object>() { { "id", id } }));
-            
+
             return result.FirstOrDefault();
         }
-
         public User FindByEmail(string email)
         {
             List<User> result = this.ReadToList(this.db.ExecuteReader("SELECT * FROM User WHERE Email = @mail", new Dictionary<string, object>() { { "mail", email } }));
@@ -36,7 +36,13 @@ namespace REST_API.Repositories
         {
             string sql = "INSERT INTO User(Name, Email, Password) VALUES (@name,@email,@pass)";
 
-            this.db.ExecuteNonQuery(sql, new Dictionary<string, object>() { {"name",user.Name },{"email",user.Email },{ "pass", user.Password } });
+            this.db.ExecuteNonQuery(sql, new Dictionary<string, object>() { { "name", user.Name }, { "email", user.Email }, { "pass", user.Password } });
+        }
+        public List<Group_User> GetGroups(uint Id_User)
+        {
+            string sql = "SELECT * FROM `Group_User` WHERE `Id_User` = @Id_User";
+
+            return this.ReadToGroup_User(db.ExecuteReader(sql, new Dictionary<string, object>() { { "Id_User", Id_User } }));
         }
 
         public void UpdateLastOnline(uint id)
@@ -62,6 +68,27 @@ namespace REST_API.Repositories
                 };
 
                 result.Add(user);
+            }
+
+            reader.Close();
+            return result;
+        }
+        private List<Group_User> ReadToGroup_User(MySqlDataReader reader)
+        {
+            List<Group_User> result = new List<Group_User>();
+
+            while (reader.Read())
+            {
+                Group_User group_User = new Group_User()
+                {
+                    Id_User = reader.GetUInt32("Id_User"),
+                    Id_Group = reader.GetUInt32("Id_Group"),
+                    NickName = reader.IsDBNull(reader.GetOrdinal("Nickname")) ? null : reader.GetString("Nickname"),
+                    Permission = (Permission)Enum.Parse(typeof(Permission), reader.GetString("Permission")),
+                    IgnoreExpire = reader.IsDBNull(reader.GetOrdinal("IgnoreExpire")) ? (DateTime?)null : reader.GetDateTime("IgnoreExpire")
+                };
+
+                result.Add(group_User);
             }
 
             reader.Close();
