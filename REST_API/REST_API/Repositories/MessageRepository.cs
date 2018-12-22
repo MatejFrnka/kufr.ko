@@ -25,7 +25,6 @@ namespace REST_API.Repositories
 
             List<Message> result = ReadToList(db.ExecuteReader(sql, new Dictionary<string, object>() { { "Id", Id_Message} }));
             return result.Count == 0 ? null : result[0];
-
         }
 
         public ulong SendMessage(uint Id_Sender, SendMessage message)
@@ -144,7 +143,7 @@ namespace REST_API.Repositories
             reader.Close();
             foreach (var item in messages)
             {
-                item.Item2.UserInfo = new UserInfo(userRepository.FindById(item.Item1));
+                item.Item2.UserInfo = new UserInfo(userRepository.FindById(item.Item1),item.Item2.Id_Group);
             }
             List<SingleMessage> singleMessages = new List<SingleMessage>();
             messages.ForEach((item) => singleMessages.Add(item.Item2));

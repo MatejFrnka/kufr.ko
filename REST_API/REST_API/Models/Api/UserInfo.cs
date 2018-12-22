@@ -12,7 +12,7 @@ namespace REST_API.Models.Api
         {
 
         }
-        public UserInfo(User user)
+        public UserInfo(User user, uint Id_Group)
         {
             this.Id = user.Id;
             this.Name = user.Name;
@@ -21,5 +21,6 @@ namespace REST_API.Models.Api
         public uint Id { get; set; }
         public string Name { get; set; }
         public uint Id_Attachment { get; set; }
+        public string Nickname { get; set; }
     }
 }

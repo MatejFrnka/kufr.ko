@@ -206,7 +206,6 @@ namespace REST_API.Controllers
                 return new Response() { StatusCode = Models.Enums.StatusCode.DATABASE_ERROR };
                 throw ex;
             }
-
         }
         private bool InGroup(uint Id_User, uint Id_Group)
         {
