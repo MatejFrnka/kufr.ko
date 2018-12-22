@@ -7,6 +7,6 @@ namespace REST_API.Models.Enums
 {
     public enum FriendRequestState
     {
-        PENDING, ACCEPTED, REJECTED, BLOCKED
+        PENDING, ACCEPTED, BLOCKED
     }
 }
