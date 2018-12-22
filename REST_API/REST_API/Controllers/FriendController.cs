@@ -108,7 +108,7 @@ namespace REST_API.Controllers
                 throw;
             }
         }
-        [HttpPost]
+        [HttpPatch]
         public Response ChangeFriendStatus(uint IdReceiver,FriendRequestState friendStatus)
         {
             uint Id = 1;
