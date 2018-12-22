@@ -1,4 +1,5 @@
-﻿using REST_API.Models.Api;
+﻿using REST_API.Authentication;
+using REST_API.Models.Api;
 using REST_API.Models.Database;
 using REST_API.Models.Enums;
 using REST_API.Repositories;
@@ -12,26 +13,28 @@ using System.Web.Http;
 
 namespace REST_API.Controllers
 {
+    [UserAuth]
     public class FriendController : ApiController
     {
         private DbManager dbManager;
         private UserRepository userRepository;
         private FriendRepository friendRepository;
-
+        private uint userId;
+        
         public FriendController()
         {
             this.dbManager = new DbManager();
             this.userRepository = new UserRepository(this.dbManager);
             this.friendRepository = new FriendRepository(this.dbManager);
+            userId = ((UserPrincipal)User).DbUser.Id;
         }
         [HttpGet]
         public Response LoadExistingFriends()
         {
-            uint Id = 1;
             try
             {
-                List<UserPublic> friends = friendRepository.FindAcceptedFriends(Id);
-                FileController.LoadAttachements(friends);
+                List<UserPublic> friends = friendRepository.FindAcceptedFriends(userId);
+                FileController.LoadProfilePictures(friends);
                 Response response = new Response();
                 response.StatusCode = Models.Enums.StatusCode.OK;
                 response.Data = friends;
@@ -46,11 +49,10 @@ namespace REST_API.Controllers
         [HttpGet]
         public Response LoadPending()
         {
-            uint Id = 1;
             try
             {
-                List<UserPublic> friends = friendRepository.FindByState(Id,FriendRequestState.PENDING);
-                FileController.LoadAttachements(friends);
+                List<UserPublic> friends = friendRepository.FindByState(userId,FriendRequestState.PENDING);
+                FileController.LoadProfilePictures(friends);
                 Response response = new Response();
                 response.StatusCode = Models.Enums.StatusCode.OK;
                 response.Data = friends;
@@ -65,11 +67,10 @@ namespace REST_API.Controllers
         [HttpGet]
         public Response LoadBlocked()
         {
-            uint Id = 1;
             try
             {
-                List<UserPublic> friends = friendRepository.FindByState(Id,FriendRequestState.BLOCKED);
-                FileController.LoadAttachements(friends);
+                List<UserPublic> friends = friendRepository.FindByState(userId,FriendRequestState.BLOCKED);
+                FileController.LoadProfilePictures(friends);
                 Response response = new Response();
                 response.StatusCode = Models.Enums.StatusCode.OK;
                 response.Data = friends;
@@ -84,12 +85,10 @@ namespace REST_API.Controllers
         [HttpPost]
         public Response CreateFriendRequest(uint IdReceiver)
         {
-            uint Id = 1;
-
             try
             {
                 Response response = new Response();
-                bool insert = friendRepository.CreateRequest(Id, IdReceiver);
+                bool insert = friendRepository.CreateRequest(userId, IdReceiver);
                 if (insert)
                 {
                     response.StatusCode = Models.Enums.StatusCode.OK;
@@ -111,12 +110,10 @@ namespace REST_API.Controllers
         [HttpPatch]
         public Response ChangeFriendStatus(uint IdReceiver,FriendRequestState friendStatus)
         {
-            uint Id = 1;
-
             try
             {
                 Response response = new Response();
-                bool insert = friendRepository.RespondToRequest(Id,IdReceiver, friendStatus);
+                bool insert = friendRepository.RespondToRequest(userId,IdReceiver, friendStatus);
                 if (insert)
                 {
                     response.StatusCode = Models.Enums.StatusCode.OK;
@@ -138,12 +135,10 @@ namespace REST_API.Controllers
         [HttpDelete]
         public Response RemoveFriend(uint IdFriend)
         {
-            uint Id = 1;
-
             try
             {
                 Response response = new Response();
-                bool delete = friendRepository.DeleteFriend(Id, IdFriend);
+                bool delete = friendRepository.DeleteFriend(userId, IdFriend);
                 if (delete)
                 {
                     response.StatusCode = Models.Enums.StatusCode.OK;

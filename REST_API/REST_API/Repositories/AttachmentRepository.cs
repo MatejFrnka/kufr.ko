@@ -21,6 +21,12 @@ namespace REST_API.Repositories
 
             return this.ReadToList(db.ExecuteReader(sql, new Dictionary<string, object>() { {"Id_Message", Id_Message } }));
         }
+        public Attachment FindByIdSecure(uint Id_Attachment,uint Id_User)
+        {
+            string sql = "SELECT a.Path, a.Mime FROM Attachment a INNER JOIN Message_Attachment ma on ma.Id_Attachment = a.Id INNER JOIN Message m on ma.Id_Message = m.Id INNER JOIN Group_User gu on gu.Id_Group = m.Id_Group WHERE a.Id = @Id_Attachment AND gu.Id_User = @Id_User";
+
+            return this.ReadToObject(db.ExecuteReader(sql, new Dictionary<string, object>() { { "Id_Attachment", Id_Attachment } }));
+        }
         private List<Attachment> ReadToList(MySqlDataReader reader)
         {
             List<Attachment> result = new List<Attachment>();
@@ -36,6 +42,14 @@ namespace REST_API.Repositories
             }
             reader.Close();
 
+            return result;
+        }
+        private Attachment ReadToObject(MySqlDataReader reader)
+        {
+            Attachment result = new Attachment();
+            result.Mime = reader.GetString("Mime");
+            result.Path = reader.GetString("Path");
+            reader.Close();
             return result;
         }
     }
