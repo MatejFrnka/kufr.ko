@@ -216,6 +216,7 @@
     <Compile Include="Models\Api\Message\SendMessage.cs" />
     <Compile Include="Models\Api\Response.cs" />
     <Compile Include="Models\Api\UserInfo.cs" />
+    <Compile Include="Models\Database\Attachment.cs" />
     <Compile Include="Models\Database\FriendRequest.cs" />
     <Compile Include="Models\Database\Group.cs" />
     <Compile Include="Models\Database\Group_User.cs" />
@@ -227,6 +228,7 @@
     <Compile Include="Models\Enums\Permission.cs" />
     <Compile Include="Models\Enums\StatusCode.cs" />
     <Compile Include="Models\Enums\Visibility.cs" />
+    <Compile Include="Repositories\AttachmentRepository.cs" />
     <Compile Include="Repositories\GroupRepository.cs" />
     <Compile Include="Repositories\MessageRepository.cs" />
     <Compile Include="Repositories\TokenRepository.cs" />

@@ -56,7 +56,12 @@ namespace REST_API.Repositories
 
             this.db.ExecuteNonQuery(sql, new Dictionary<string, object>() { { "id", user.Id }, { "name", user.Name }, { "email", user.Email }, { "pass", user.Password }, { "crt", user.Created }, { "lo", user.LastOnline }, { "visibility", user.Visibility.ToString() }, { "idA", user.Id_Attachment } });
         }
+        public UserInfo GetUserInfo(uint Id_User, uint Id_Group)
+        {
+            string sql = "SELECT * FROM `Group_User` INNER JOIN `User` ON `Group_User`.`Id_User`= `User`.`Id` WHERE `Id_Group` = @Id_Group AND `Id_User` = @Id_User";
 
+            return this.ReadToUserInfo(this.db.ExecuteReader(sql, new Dictionary<string, object>() { { "Id_Group", Id_Group }, { "Id_User", Id_User } }));
+        }
         private List<User> ReadToList(MySqlDataReader reader)
         {
             List<User> result = new List<User>();
@@ -97,6 +102,24 @@ namespace REST_API.Repositories
                 };
 
                 result.Add(group_User);
+            }
+
+            reader.Close();
+            return result;
+        }
+        private UserInfo ReadToUserInfo(MySqlDataReader reader)
+        {
+            UserInfo result = null;
+
+            if (reader.Read())
+            {
+                result = new UserInfo()
+                {
+                    Id = reader.GetUInt32("Id_User"),
+                    Id_Attachment = reader.GetUInt32("Id_Attachment"),
+                    Name = reader.GetString("Name"),
+                    Nickname = reader.IsDBNull(reader.GetOrdinal("Nickname")) ? null : reader.GetString("Nickname")
+                };
             }
 
             reader.Close();

@@ -13,11 +13,13 @@ namespace REST_API.Repositories
     public class MessageRepository
     {
         private DbManager db;
-        public UserRepository userRepository;
+        private UserRepository userRepository;
+        private AttachmentRepository attachmentRepository;
         public MessageRepository(DbManager dbManager)
         {
             db = dbManager;
             userRepository = new UserRepository(db);
+            attachmentRepository = new AttachmentRepository(db);
         }
         public Message FindById(ulong Id_Message)
         {
@@ -68,8 +70,10 @@ namespace REST_API.Repositories
         {
             if (editMessage.Text != null)
             {
-                string sql = "INSERT INTO `MessageHistory` SELECT null as `Id`,  `Id` as `Id_Message`, `TextBody`, 0 as `File`, now() as `ChangedTime` FROM `Message` WHERE `Id` = @Id_Message;";
-                db.ExecuteNonQuery(sql, new Dictionary<string, object>() { { "Id_Message", editMessage.Id_Message } });
+                bool File = attachmentRepository.FindByMessageId(editMessage.Id_Message).Count > 0;
+            
+                string sql = "INSERT INTO `MessageHistory` SELECT null as `Id`,  `Id` as `Id_Message`, `TextBody`, @File as `File`, now() as `ChangedTime` FROM `Message` WHERE `Id` = @Id_Message;";
+                db.ExecuteNonQuery(sql, new Dictionary<string, object>() { { "Id_Message", editMessage.Id_Message }, {"File", File } });
 
                 sql = "UPDATE `Message` SET `TextBody`=@Text_Body, `Edited`=1 WHERE `Id` = @Id";
                 db.ExecuteNonQuery(sql, new Dictionary<string, object>() { { "Id", editMessage.Id_Message }, { "Text_Body", editMessage.Text } });
@@ -141,9 +145,10 @@ namespace REST_API.Repositories
                 prevId = currId;
             }
             reader.Close();
+
             foreach (var item in messages)
             {
-                item.Item2.UserInfo = new UserInfo(userRepository.FindById(item.Item1),item.Item2.Id_Group);
+                item.Item2.UserInfo = userRepository.GetUserInfo(item.Item1, item.Item2.Id_Group);
             }
             List<SingleMessage> singleMessages = new List<SingleMessage>();
             messages.ForEach((item) => singleMessages.Add(item.Item2));

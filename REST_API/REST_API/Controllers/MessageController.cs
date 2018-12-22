@@ -21,13 +21,6 @@ namespace REST_API.Controllers
 
         MessageRepository repository = new MessageRepository(new DbManager());
         UserRepository userRepository = new UserRepository(new DbManager());
-        [HttpPost]
-        public void test()
-        {
-            List<SetMessageState> d = new List<SetMessageState>() { new Models.Api.Message.SetMessageState() { Id_Message = 12, Seen = false } };
-            Debug.WriteLine(JsonSerializationUtility.Serialize(d));
-            return;
-        }
         /// <summary>
         /// Adds a message to target group.
         /// </summary>
