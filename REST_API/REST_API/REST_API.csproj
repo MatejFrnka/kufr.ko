@@ -224,6 +224,7 @@
     <Compile Include="Models\Database\MessageHistory.cs" />
     <Compile Include="Models\Database\Token.cs" />
     <Compile Include="Models\Database\User.cs" />
+    <Compile Include="Models\Database\UserPublic.cs" />
     <Compile Include="Models\Enums\FriendRequestState.cs" />
     <Compile Include="Models\Enums\Permission.cs" />
     <Compile Include="Models\Enums\StatusCode.cs" />
