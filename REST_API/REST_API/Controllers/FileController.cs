@@ -32,15 +32,15 @@ namespace REST_API.Controllers
         }
 
 
-        public static List<UserPublic> LoadProfilePictures (List<UserPublic> users)
-        {
-            for (int i = 0; i < users.Count; i++)
-            {
-                string picture = LoadFile(users[i].Attachement);
-                users[i].Attachement = picture;
-            }
-            return users;
-        }
+        //public static List<UserPublic> LoadProfilePictures (List<UserPublic> users)
+        //{
+        //    for (int i = 0; i < users.Count; i++)
+        //    {
+        //        string picture = LoadFile(users[i].Attachement);
+        //        users[i].Attachement = picture;
+        //    }
+        //    return users;
+        //}
         public static string LoadFile(string path)
         {
             byte[] bytes = File.ReadAllBytes(path);

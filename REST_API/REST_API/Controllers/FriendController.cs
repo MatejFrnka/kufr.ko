@@ -34,7 +34,6 @@ namespace REST_API.Controllers
             try
             {
                 List<UserPublic> friends = friendRepository.FindAcceptedFriends(userId);
-                FileController.LoadProfilePictures(friends);
                 Response response = new Response();
                 response.StatusCode = Models.Enums.StatusCode.OK;
                 response.Data = friends;
@@ -52,7 +51,6 @@ namespace REST_API.Controllers
             try
             {
                 List<UserPublic> friends = friendRepository.FindByState(userId,FriendRequestState.PENDING);
-                FileController.LoadProfilePictures(friends);
                 Response response = new Response();
                 response.StatusCode = Models.Enums.StatusCode.OK;
                 response.Data = friends;
@@ -70,7 +68,6 @@ namespace REST_API.Controllers
             try
             {
                 List<UserPublic> friends = friendRepository.FindByState(userId,FriendRequestState.BLOCKED);
-                FileController.LoadProfilePictures(friends);
                 Response response = new Response();
                 response.StatusCode = Models.Enums.StatusCode.OK;
                 response.Data = friends;
