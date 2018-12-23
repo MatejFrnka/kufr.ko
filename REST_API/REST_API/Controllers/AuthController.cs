@@ -74,6 +74,14 @@ namespace REST_API.Controllers
             if (user.Name == null || user.Password == null || user.Email == null)
                 return new Response() { StatusCode = Models.Enums.StatusCode.INVALID_REQUEST };
 
+            if (String.IsNullOrWhiteSpace(user.Name))
+                return new Response() { StatusCode = Models.Enums.StatusCode.EMPTY_NAME };
+
+            if (String.IsNullOrWhiteSpace(user.Email))
+                return new Response() { StatusCode = Models.Enums.StatusCode.EMPTY_EMAIL };
+
+            if (String.IsNullOrWhiteSpace(user.Password))
+                return new Response() { StatusCode = Models.Enums.StatusCode.EMPTY_PASSWORD };
 
             User dbUser = new User() { Name = user.Name, Email = user.Email, Password = HashUtility.HashPassword(user.Password) };
 

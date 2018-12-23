@@ -1,6 +1,7 @@
 ﻿using MySql.Data.MySqlClient;
 using REST_API.Models.Api.Group;
 using REST_API.Models.Database;
+using REST_API.Models.Enums;
 using REST_API.Utilities;
 using System;
 using System.Collections.Generic;
@@ -25,6 +26,15 @@ namespace REST_API.Repositories
             return result.FirstOrDefault();
         }
 
+        public GroupDetailInfo FindByIdInfo(uint groupId,uint userId)
+        {
+            string sql = "SELECT g.Id, g.GroupName, g.HistoryVisibility, g.Id_Attachment,IF(g.GroupName IS NOT NULL,g.GroupName,(SELECT GROUP_CONCAT(IF(gu.Nickname IS NULL, uu.Name, gu.Nickname) SEPARATOR ', ') FROM Group_User gu INNER JOIN User uu ON uu.Id = gu.Id_User WHERE gu.Id_Group = g.Id AND gu.Id_User != @uid)) AS DisplayName,gu.Id_User,gu.Id_Group,gu.Nickname,u.Name,gu.Permission FROM `Group` g INNER JOIN Group_User gu ON gu.Id_Group = g.Id INNER JOIN User u ON u.Id = gu.Id_User WHERE (SELECT COUNT(guu.Id_User) FROM Group_User guu WHERE guu.Id_Group = g.Id AND guu.Id_User = @uid) > 0 AND g.Id = @gid ORDER BY g.Id";
+
+            List<GroupDetailInfo> result = this.ReadToListGroupDetailInfo(this.db.ExecuteReader(sql, new Dictionary<string, object>() { { "uid", userId }, {"gid", groupId } }));
+
+            return result.FirstOrDefault();
+        }
+
         public List<GroupInfo> FindAllForUser(uint userId)
         {
             string sql = "SELECT g.Id,IF(g.GroupName IS NOT NULL,g.GroupName,(SELECT GROUP_CONCAT(IF(gu.Nickname IS NULL, uu.Name, gu.Nickname) SEPARATOR ', ') FROM Group_User gu INNER JOIN User uu ON uu.Id = gu.Id_User WHERE gu.Id_Group = g.Id AND gu.Id_User != @uid)) AS Name, g.Id_Attachment,u.IgnoreExpire,IF(senderG.Nickname IS NULL, senderU.Name, senderG.Nickname) AS sender, m.TextBody,m.Sent,(SELECT COUNT(mn1.Id) FROM Message mn1 WHERE mn1.Id_Group = g.Id) - (SELECT COUNT(mn2.Id) FROM Message mn2 INNER JOIN MessageState ms ON mn2.Id = ms.Id_Message WHERE mn2.Id_Group = g.Id AND ms.Id_User = @uid AND Seen = 1) AS NewMessages " +
@@ -33,6 +43,63 @@ namespace REST_API.Repositories
             return this.ReadToListGroupInfo(this.db.ExecuteReader(sql, new Dictionary<string, object>() { { "uid", userId } }));
 
             //return this.ReadToList(this.db.ExecuteReader("SELECT g.* FROM `Group` g INNER JOIN Group_User u ON g.Id = u.Id_Group LEFT JOIN Message m ON m.Id_Group = g.Id WHERE u.Id_User = @uid GROUP BY(g.Id) ORDER BY MAX(m.Id) DESC", new Dictionary<string, object>() { { "uid", userId } }));
+        }
+
+        public void CreateForUserWithDefaults(Group group,uint userId)
+        {
+            string sql = "INSERT INTO `Group`(GroupName, HistoryVisibility, Id_Attachment) VALUES (@gname,@vis,@idA) SELECT LAST_INSERT_ID()";
+
+            uint gId = (uint) this.db.ExecuteScalar(sql, new Dictionary<string, object>() { { "gname", group.GroupName }, { "vis",group.HistoryVisibility }, { "idA",group.Id_Attachment } });
+
+            string sql2 = "INSERT INTO Group_User(Id_User, Id_Group, Permission) VALUES (@uid,@gid,'OWNER')";
+
+            this.db.ExecuteNonQuery(sql2, new Dictionary<string, object>() { { "uid", userId },{ "gid", gId } });
+        }
+
+        private List<GroupDetailInfo> ReadToListGroupDetailInfo(MySqlDataReader reader)
+        {
+            List<GroupDetailInfo> result = new List<GroupDetailInfo>();
+
+            GroupDetailInfo lastInfo = null;
+
+            while (reader.Read())
+            {
+                uint gId = reader.GetUInt32("Id");
+
+                if(lastInfo == null || lastInfo.Id != gId)
+                {
+                    if (lastInfo != null)
+                        result.Add(lastInfo);
+
+                    lastInfo = new GroupDetailInfo()
+                    {
+                        Id = gId,
+                        GroupName = reader.IsDBNull(reader.GetOrdinal("GroupName")) ? null : reader.GetString("GroupName"),
+                        HistoryVisibility = reader.GetBoolean("HistoryVisibility"),
+                        Id_Attachment = reader.GetUInt32("Id_Attachment"),
+                        DisplayName = reader.IsDBNull(reader.GetOrdinal("DisplayName")) ? "Pouze já" : reader.GetString("DisplayName"),
+                        Users = new List<Group_UserInfo>()
+                    };
+                }
+
+                Group_UserInfo guInfo = new Group_UserInfo()
+                {
+                    Id_User = reader.GetUInt32("Id_User"),
+                    Id_Group = reader.GetUInt32("Id_Group"),
+                    Nickname = reader.IsDBNull(reader.GetOrdinal("Nickname")) ? null : reader.GetString("NickName"),
+                    Name = reader.GetString("Name"),
+                    Permission = (Permission)Enum.Parse(typeof(Permission), reader.GetString("Permission"))
+                };
+
+                lastInfo.Users.Add(guInfo);
+            }
+
+            reader.Close();
+
+            if (lastInfo != null)
+                result.Add(lastInfo);
+
+            return result;
         }
 
         private List<GroupInfo> ReadToListGroupInfo(MySqlDataReader reader)

@@ -43,5 +43,25 @@ namespace REST_API.Controllers
 
             return new Response() { StatusCode = Models.Enums.StatusCode.OK, Data = groups };
         }
+
+        [HttpGet]
+        public Response GetDetail(uint id)
+        {
+            GroupDetailInfo info;
+
+            try
+            {
+                info = this.groupRepository.FindByIdInfo(id,((UserPrincipal)User).DbUser.Id);
+            }
+            catch (MySqlException)
+            {
+                return new Response() { StatusCode = Models.Enums.StatusCode.DATABASE_ERROR };
+            }
+
+            if (info == null)
+                return new Response() { StatusCode = Models.Enums.StatusCode.FORBIDDEN };
+
+            return new Response() { StatusCode = Models.Enums.StatusCode.OK, Data = info };
+        }
     }
 }

@@ -10,6 +10,9 @@
         DATABASE_ERROR,
         INVALID_EMAIL,
         INVALID_PASSWORD,
+        EMPTY_EMAIL,
+        EMPTY_PASSWORD,
+        EMPTY_NAME,
         EMAIL_ALREADY_EXISTS,
         FORBIDDEN
     }
