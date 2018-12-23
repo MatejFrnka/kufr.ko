@@ -1,5 +1,7 @@
-﻿using REST_API.Models.Api;
+﻿using REST_API.Authentication;
+using REST_API.Models.Api;
 using REST_API.Models.Database;
+using REST_API.Models.Enums;
 using REST_API.Repositories;
 using REST_API.Utilities;
 using System;
@@ -11,26 +13,27 @@ using System.Web.Http;
 
 namespace REST_API.Controllers
 {
+    [UserAuth]
     public class FriendController : ApiController
     {
         private DbManager dbManager;
         private UserRepository userRepository;
         private FriendRepository friendRepository;
-
+        private uint userId;
+        
         public FriendController()
         {
             this.dbManager = new DbManager();
             this.userRepository = new UserRepository(this.dbManager);
             this.friendRepository = new FriendRepository(this.dbManager);
+            userId = ((UserPrincipal)User).DbUser.Id;
         }
         [HttpGet]
         public Response LoadExistingFriends()
         {
-            uint Id = 1;
             try
             {
-                List<uint> friends = friendRepository.FindAcceptedFriends(Id);
-
+                List<UserPublic> friends = friendRepository.FindAcceptedFriends(userId);
                 Response response = new Response();
                 response.StatusCode = Models.Enums.StatusCode.OK;
                 response.Data = friends;
@@ -42,6 +45,114 @@ namespace REST_API.Controllers
                 throw;
             }
         }
+        [HttpGet]
+        public Response LoadPending()
+        {
+            try
+            {
+                List<UserPublic> friends = friendRepository.FindByState(userId,FriendRequestState.PENDING);
+                Response response = new Response();
+                response.StatusCode = Models.Enums.StatusCode.OK;
+                response.Data = friends;
+                return response;
+            }
+            catch (Exception)
+            {
+                return new Response() { StatusCode = Models.Enums.StatusCode.DATABASE_ERROR };
+                throw;
+            }
+        }
+        [HttpGet]
+        public Response LoadBlocked()
+        {
+            try
+            {
+                List<UserPublic> friends = friendRepository.FindByState(userId,FriendRequestState.BLOCKED);
+                Response response = new Response();
+                response.StatusCode = Models.Enums.StatusCode.OK;
+                response.Data = friends;
+                return response;
+            }
+            catch (Exception)
+            {
+                return new Response() { StatusCode = Models.Enums.StatusCode.DATABASE_ERROR };
+                throw;
+            }
+        }
+        [HttpPost]
+        public Response CreateFriendRequest(uint IdReceiver)
+        {
+            try
+            {
+                Response response = new Response();
+                bool insert = friendRepository.CreateRequest(userId, IdReceiver);
+                if (insert)
+                {
+                    response.StatusCode = Models.Enums.StatusCode.OK;
+                }
+                else
+                {
+                    response.StatusCode = Models.Enums.StatusCode.INVALID_REQUEST;
+                }
 
+                
+                return response;
+            }
+            catch (Exception)
+            {
+                return new Response() { StatusCode = Models.Enums.StatusCode.DATABASE_ERROR };
+                throw;
+            }
+        }
+        [HttpPatch]
+        public Response ChangeFriendStatus(uint IdReceiver,FriendRequestState friendStatus)
+        {
+            try
+            {
+                Response response = new Response();
+                bool insert = friendRepository.RespondToRequest(userId,IdReceiver, friendStatus);
+                if (insert)
+                {
+                    response.StatusCode = Models.Enums.StatusCode.OK;
+                }
+                else
+                {
+                    response.StatusCode = Models.Enums.StatusCode.INVALID_REQUEST;
+                }
+
+
+                return response;
+            }
+            catch (Exception)
+            {
+                return new Response() { StatusCode = Models.Enums.StatusCode.DATABASE_ERROR };
+                throw;
+            }
+        }
+        [HttpDelete]
+        public Response RemoveFriend(uint IdFriend)
+        {
+            try
+            {
+                Response response = new Response();
+                bool delete = friendRepository.DeleteFriend(userId, IdFriend);
+                if (delete)
+                {
+                    response.StatusCode = Models.Enums.StatusCode.OK;
+                }
+                else
+                {
+                    response.StatusCode = Models.Enums.StatusCode.INVALID_REQUEST;
+                }
+
+
+                return response;
+            }
+            catch (Exception)
+            {
+                return new Response() { StatusCode = Models.Enums.StatusCode.DATABASE_ERROR };
+                throw;
+            }
+        }
     }
 }
