@@ -1,5 +1,6 @@
 ﻿using REST_API.Authentication;
 using REST_API.Models.Api;
+using REST_API.Models.Api.Attachments;
 using REST_API.Models.Database;
 using REST_API.Repositories;
 using REST_API.Utilities;
@@ -53,16 +54,19 @@ namespace REST_API.Controllers
             {
                 Response response = new Response();
                 Attachment attachment = attachmentRepository.FindByIdSecure(IdAttachment, userId);
-                if (attachment.Path == "")
+                if (attachment == null)
                 {
                     response.StatusCode = Models.Enums.StatusCode.INVALID_REQUEST;
                 }
                 else
                 {
-                    string attachmentFullPath = path + attachment.Path;
+                    string attachmentFullPath = path + IdAttachment;
                     if (File.Exists(attachmentFullPath))
                     {
-                        response.Data = LoadFile(attachmentFullPath);
+                        AttachmentData attachmentData = new AttachmentData();
+                        attachmentData.Info = attachment;
+                        attachmentData.Data = LoadFile(attachmentFullPath);
+                        response.Data = attachmentData;
                         response.StatusCode = Models.Enums.StatusCode.OK;
                     }
                     else

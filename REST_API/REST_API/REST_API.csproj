@@ -207,6 +207,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\Api\Attachments\AttachmentData.cs" />
     <Compile Include="Models\Api\Auth\UserCredentials.cs" />
     <Compile Include="Models\Api\Group\GroupDetailInfo.cs" />
     <Compile Include="Models\Api\Group\GroupInfo.cs" />
