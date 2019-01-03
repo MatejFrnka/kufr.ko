@@ -42,7 +42,7 @@ namespace REST_API.Controllers
         //    }
         //    return users;
         //}
-        public static string LoadFile(string path)
+        private static string LoadFile(string path)
         {
             byte[] bytes = File.ReadAllBytes(path);
             return Convert.ToBase64String(bytes);
@@ -82,9 +82,33 @@ namespace REST_API.Controllers
             catch (Exception)
             {
                 return new Response() { StatusCode = Models.Enums.StatusCode.DATABASE_ERROR };
-                throw;
             }
         }
+        [HttpPost]
+        
+        public Response SaveAttachment(AttachmentData attachment)
+        {
+            Response response = new Response();
+            try
+            {
+                byte[] bytes = Convert.FromBase64String(attachment.Data);
+                var md5 = HashAlgorithm.Create();
+                attachment.Info.Hash = BitConverter.ToString(md5.ComputeHash(bytes)).Replace("-", "").ToLowerInvariant();
+                
+                uint id = attachmentRepository.CreateAttachment(attachment.Info);
+                File.WriteAllBytes(id.ToString(), bytes);
+                response.StatusCode = Models.Enums.StatusCode.OK;
+            }
+            catch (Exception)
+            {
+                response.StatusCode = Models.Enums.StatusCode.DATABASE_ERROR;
+            }
+            return response;
+        }
+
+
+
+
         /// <summary>
         /// Returns MD5 hash for file specified in <paramref name="filename"/>
         /// </summary>

@@ -1,4 +1,5 @@
 ﻿using MySql.Data.MySqlClient;
+using REST_API.Models.Api.Attachments;
 using REST_API.Models.Database;
 using REST_API.Utilities;
 using System;
@@ -27,6 +28,15 @@ namespace REST_API.Repositories
 
             return this.ReadToObject(db.ExecuteReader(sql, new Dictionary<string, object>() { { "Id_Attachment", Id_Attachment } }));
         }
+        public uint CreateAttachment(Attachment attachment)
+        {
+            string sql = "INSERT INTO Attachment(Filename,Mime,Hash) @attachment.Filename, @attachment.Mime, @attachment.Hash; SELECT SCOPE_IDENTITY()";
+
+            return (uint)this.db.ExecuteScalar(sql, new Dictionary<string, object>());
+
+        }
+        
+
         private List<Attachment> ReadToList(MySqlDataReader reader)
         {
             List<Attachment> result = new List<Attachment>();
@@ -37,20 +47,25 @@ namespace REST_API.Repositories
                 {
                     Id = reader.GetUInt32("Id"),
                     Mime = reader.GetString("Mime"),
-                    Path = reader.GetString("Path")
+                    Filename = reader.GetString("Filename"),
+                    Hash = reader.GetString("Hash")
                 });
             }
             reader.Close();
 
             return result;
         }
+        
         private Attachment ReadToObject(MySqlDataReader reader)
         {
             Attachment result = new Attachment();
             result.Mime = reader.GetString("Mime");
-            result.Path = reader.GetString("Path");
+            result.Filename = reader.GetString("Filename");
+            result.Id = Convert.ToUInt32(reader.GetString("Id"));
+            result.Hash = reader.GetString("Hash");
             reader.Close();
             return result;
         }
+
     }
 }
