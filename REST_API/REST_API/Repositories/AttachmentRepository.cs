@@ -28,6 +28,12 @@ namespace REST_API.Repositories
 
             return this.ReadToObject(db.ExecuteReader(sql, new Dictionary<string, object>() { { "Id_Attachment", Id_Attachment } }));
         }
+        public uint FindIdByHash(string Hash)
+        {
+            string sql = "SELECT Id FROM Attachment WHERE Hash = @Hash";
+
+            return (uint)db.ExecuteScalar(sql, new Dictionary<string, object>() { { "Hash", Hash } });
+        }
         public uint CreateAttachment(Attachment attachment)
         {
             string sql = "INSERT INTO Attachment(Filename,Mime,Hash) @attachment.Filename, @attachment.Mime, @attachment.Hash; SELECT SCOPE_IDENTITY()";

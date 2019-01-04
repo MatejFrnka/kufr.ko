@@ -94,9 +94,18 @@ namespace REST_API.Controllers
                 byte[] bytes = Convert.FromBase64String(attachment.Data);
                 var md5 = HashAlgorithm.Create();
                 attachment.Info.Hash = BitConverter.ToString(md5.ComputeHash(bytes)).Replace("-", "").ToLowerInvariant();
+                uint? id = attachmentRepository.FindIdByHash(attachment.Info.Hash);
+                if (id!=null)
+                {
+                    response.Data = id;
+                }
+                else
+                {
+                    id= attachmentRepository.CreateAttachment(attachment.Info);
+                    response.Data = id;
+                    File.WriteAllBytes(id.ToString(), bytes);
+                }
                 
-                uint id = attachmentRepository.CreateAttachment(attachment.Info);
-                File.WriteAllBytes(id.ToString(), bytes);
                 response.StatusCode = Models.Enums.StatusCode.OK;
             }
             catch (Exception)
