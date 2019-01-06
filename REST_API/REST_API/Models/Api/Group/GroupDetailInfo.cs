@@ -11,6 +11,7 @@ namespace REST_API.Models.Api.Group
         public string GroupName { get; set; }
         public bool HistoryVisibility { get; set; }
         public uint Id_Attachment { get; set; }
+        public DateTime? IgnoreExpire { get; set; }
 
         public string DisplayName { get; set; }
 
