@@ -34,7 +34,24 @@ namespace REST_API.Controllers
 
             try
             {
-                groups = this.groupRepository.FindAllForUser(((UserPrincipal)User).DbUser.Id);
+                groups = this.groupRepository.FindAllForUser(((UserPrincipal)User).DbUser.Id,"");
+            }
+            catch (MySqlException)
+            {
+                return new Response() { StatusCode = Models.Enums.StatusCode.DATABASE_ERROR };
+            }
+
+            return new Response() { StatusCode = Models.Enums.StatusCode.OK, Data = groups };
+        }
+
+        [HttpPost]
+        public Response Find(string name)
+        {
+            List<GroupInfo> groups;
+
+            try
+            {
+                groups = this.groupRepository.FindAllForUser(((UserPrincipal)User).DbUser.Id, name);
             }
             catch (MySqlException)
             {

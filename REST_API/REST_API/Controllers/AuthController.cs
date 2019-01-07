@@ -33,8 +33,11 @@ namespace REST_API.Controllers
             if (user == null)
                 return new Response() { StatusCode = Models.Enums.StatusCode.INVALID_REQUEST };
 
-            if(user.Email == null || user.Password == null)
-                return new Response() { StatusCode = Models.Enums.StatusCode.INVALID_REQUEST };
+            if (String.IsNullOrWhiteSpace(user.Email))
+                return new Response() { StatusCode = Models.Enums.StatusCode.EMPTY_EMAIL };
+
+            if (String.IsNullOrWhiteSpace(user.Password))
+                return new Response() { StatusCode = Models.Enums.StatusCode.EMPTY_PASSWORD };
 
             User dbUser;
             
@@ -71,7 +74,7 @@ namespace REST_API.Controllers
         [HttpPost]
         public Response Register([FromBody]UserCredentials user)
         {
-            if (user.Name == null || user.Password == null || user.Email == null)
+            if (user == null)
                 return new Response() { StatusCode = Models.Enums.StatusCode.INVALID_REQUEST };
 
             if (String.IsNullOrWhiteSpace(user.Name))
