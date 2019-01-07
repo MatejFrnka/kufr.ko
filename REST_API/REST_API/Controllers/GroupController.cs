@@ -44,7 +44,7 @@ namespace REST_API.Controllers
             return new Response() { StatusCode = Models.Enums.StatusCode.OK, Data = groups };
         }
 
-        [HttpPost]
+        [HttpGet]
         public Response Find(string name)
         {
             List<GroupInfo> groups;
