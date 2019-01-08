@@ -58,7 +58,7 @@ namespace REST_API.Repositories
                 {
                     Id = reader.GetUInt32("Id"),
                     Name = reader.GetString("Name"),
-                    Id_Attachement = reader.GetUInt32("Id_Attachment")
+                    Id_Attachment = reader.GetUInt32("Id_Attachment")
                 };
                 result.Add(u);
             }

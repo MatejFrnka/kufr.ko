@@ -26,11 +26,12 @@ namespace REST_API.Controllers
             this.dbManager = new DbManager();
             this.userRepository = new UserRepository(this.dbManager);
             this.friendRepository = new FriendRepository(this.dbManager);
-            userId = ((UserPrincipal)User).DbUser.Id;
+            //userId = ((UserPrincipal)User).DbUser.Id;
         }
         [HttpGet]
         public Response LoadExistingFriends()
         {
+            userId = ((UserPrincipal)User).DbUser.Id;
             try
             {
                 List<UserPublic> friends = friendRepository.FindAcceptedFriends(userId);
@@ -48,6 +49,7 @@ namespace REST_API.Controllers
         [HttpGet]
         public Response LoadPending()
         {
+            userId = ((UserPrincipal)User).DbUser.Id;
             try
             {
                 List<UserPublic> friends = friendRepository.FindByState(userId,FriendRequestState.PENDING);
@@ -65,6 +67,7 @@ namespace REST_API.Controllers
         [HttpGet]
         public Response LoadBlocked()
         {
+            userId = ((UserPrincipal)User).DbUser.Id;
             try
             {
                 List<UserPublic> friends = friendRepository.FindByState(userId,FriendRequestState.BLOCKED);
@@ -82,6 +85,7 @@ namespace REST_API.Controllers
         [HttpPost]
         public Response CreateFriendRequest(uint IdReceiver)
         {
+            userId = ((UserPrincipal)User).DbUser.Id;
             try
             {
                 Response response = new Response();
@@ -107,6 +111,7 @@ namespace REST_API.Controllers
         [HttpPatch]
         public Response ChangeFriendStatus(uint IdReceiver,FriendRequestState friendStatus)
         {
+            userId = ((UserPrincipal)User).DbUser.Id;
             try
             {
                 Response response = new Response();
@@ -132,6 +137,7 @@ namespace REST_API.Controllers
         [HttpDelete]
         public Response RemoveFriend(uint IdFriend)
         {
+            userId = ((UserPrincipal)User).DbUser.Id;
             try
             {
                 Response response = new Response();

@@ -9,7 +9,7 @@ namespace REST_API.Models.Api.Message
     {
         public uint Id_Group { get; set; }
         //0 = newest message
-        public uint StartId { get; set; }
+        public ulong StartId { get; set; }
         public uint Amount { get; set; }
     }
 }
