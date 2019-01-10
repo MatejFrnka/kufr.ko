@@ -51,7 +51,6 @@ namespace REST_API.Controllers
                     catch (MySql.Data.MySqlClient.MySqlException ex)
                     {
                         return new Response() { StatusCode = Models.Enums.StatusCode.DATABASE_ERROR };
-                        throw ex;
                     }
                 }
             }
@@ -127,7 +126,7 @@ namespace REST_API.Controllers
         {
             uint Id_User = ((UserPrincipal)User).DbUser.Id;
 
-            if (getMessage == null || getMessage.Id_Group == 0|| getMessage.StartId ==0 || getMessage.Amount == 0)
+            if (getMessage == null || getMessage.Id_Group == 0 || getMessage.Amount == 0)
             {
                 return new Response() { StatusCode = Models.Enums.StatusCode.INVALID_REQUEST };
             }

@@ -92,10 +92,21 @@ namespace REST_API.Repositories
         }
         public List<SingleMessage> GetMessages(ulong StartMessageId, uint Length, uint Id_Group)
         {
-            string sql = "SELECT `Id`, `Id_User`, `Id_Group`, `Sent`, `TextBody`,`Edited`, `Id_Attachment`  FROM `Message` " +
-                "LEFT JOIN `Message_Attachment` ON Message.Id = Message_Attachment.Id_Message " +
-                "WHERE `Message`.`Id_Group` = 1 AND `Message`.`Id` >= @StartId " +
-                "ORDER BY `Message`.`Id` DESC LIMIT 25;";
+            string sql;
+            if (StartMessageId == 0)
+            {
+                 sql = "SELECT `Id`, `Id_User`, `Id_Group`, `Sent`, `TextBody`,`Edited`, `Id_Attachment`  FROM `Message` " +
+                    "LEFT JOIN `Message_Attachment` ON Message.Id = Message_Attachment.Id_Message " +
+                    "WHERE `Message`.`Id_Group` = @Id_Group " +
+                    "ORDER BY `Message`.`Id` DESC LIMIT @Length;";
+            }
+            else
+            {
+                sql = "SELECT `Id`, `Id_User`, `Id_Group`, `Sent`, `TextBody`,`Edited`, `Id_Attachment`  FROM `Message` " +
+                    "LEFT JOIN `Message_Attachment` ON Message.Id = Message_Attachment.Id_Message " +
+                    "WHERE `Message`.`Id_Group` = @Id_Group AND `Message`.`Id` <= @StartId " +
+                    "ORDER BY `Message`.`Id` DESC LIMIT @Length;";
+            }
             List<SingleMessage> result = ReadToSingleMessage(db.ExecuteReader(sql, new Dictionary<string, object>() { { "Id_Group", Id_Group }, { "StartId", StartMessageId }, { "Length", Length } }));
             return result;
         }
