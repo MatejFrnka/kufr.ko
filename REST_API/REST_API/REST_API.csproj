@@ -220,6 +220,7 @@
     <Compile Include="Models\Api\Group\Group_UserInfo.cs" />
     <Compile Include="Models\Api\Message\EditMessage.cs" />
     <Compile Include="Models\Api\Message\GetMessage.cs" />
+    <Compile Include="Models\Api\Message\GetNewMessages.cs" />
     <Compile Include="Models\Api\Message\SetMessageState.cs" />
     <Compile Include="Models\Api\Message\SingleMessage.cs" />
     <Compile Include="Models\Api\Message\SendMessage.cs" />
@@ -284,6 +285,7 @@
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Properties\PublishProfiles\kufrko-REST-API - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.3.1.js" />
     <Content Include="Scripts\jquery-3.3.1.min.js" />

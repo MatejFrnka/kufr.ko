@@ -25,7 +25,7 @@ namespace REST_API.Repositories
         {
             string sql = "SELECT * FROM `Message` WHERE `Id` = @Id";
 
-            List<Message> result = ReadToList(db.ExecuteReader(sql, new Dictionary<string, object>() { { "Id", Id_Message} }));
+            List<Message> result = ReadToList(db.ExecuteReader(sql, new Dictionary<string, object>() { { "Id", Id_Message } }));
             return result.Count == 0 ? null : result[0];
         }
 
@@ -41,11 +41,14 @@ namespace REST_API.Repositories
         }
         public void AddAttachments(List<uint> Attachments, ulong Id_Message)
         {
-            string sql = "INSERT INTO `Message_Attachment`(`Id_Message`, `Id_Attachment`) VALUES (@Id_Message, @Id_Attachment);";
-
-            foreach (var Attachment in Attachments)
+            if (Attachments != null)
             {
-                db.ExecuteNonQuery(sql, new Dictionary<string, object>() { { "Id_Message", Id_Message }, { "Id_Attachment", Attachment } });
+                string sql = "INSERT INTO `Message_Attachment`(`Id_Message`, `Id_Attachment`) VALUES (@Id_Message, @Id_Attachment);";
+
+                foreach (var Attachment in Attachments)
+                {
+                    db.ExecuteNonQuery(sql, new Dictionary<string, object>() { { "Id_Message", Id_Message }, { "Id_Attachment", Attachment } });
+                }
             }
         }
         public void SetMessageState(uint Id_Sender, SetMessageState messageState)
@@ -71,9 +74,9 @@ namespace REST_API.Repositories
             if (editMessage.Text != null)
             {
                 bool File = attachmentRepository.FindByMessageId(editMessage.Id_Message).Count > 0;
-            
+
                 string sql = "INSERT INTO `MessageHistory` SELECT null as `Id`,  `Id` as `Id_Message`, `TextBody`, @File as `File`, now() as `ChangedTime` FROM `Message` WHERE `Id` = @Id_Message;";
-                db.ExecuteNonQuery(sql, new Dictionary<string, object>() { { "Id_Message", editMessage.Id_Message }, {"File", File } });
+                db.ExecuteNonQuery(sql, new Dictionary<string, object>() { { "Id_Message", editMessage.Id_Message }, { "File", File } });
 
                 sql = "UPDATE `Message` SET `TextBody`=@Text_Body, `Edited`=1 WHERE `Id` = @Id";
                 db.ExecuteNonQuery(sql, new Dictionary<string, object>() { { "Id", editMessage.Id_Message }, { "Text_Body", editMessage.Text } });
@@ -87,30 +90,30 @@ namespace REST_API.Repositories
         }
         public List<MessageHistory> GetMessageHistory(ulong Id_Message)
         {
-            string sql = "SELECT * FROM `MessageHistory` WHERE `Id_Message` = @Id_Message ORDER BY `ChangedTime` DESC";
+            string sql = "SELECT * FROM `MessageHistory` WHERE `Id_Message` = @Id_Message ORDER BY `ChangedTime` ASC";
             return ReadToMessageHistory(db.ExecuteReader(sql, new Dictionary<string, object>() { { "Id_Message", Id_Message } }));
         }
-        public List<SingleMessage> GetMessages(ulong StartMessageId, uint Length, uint Id_Group)
+        public List<SingleMessage> GetMessages(ulong StartMessageId, uint Length, uint Id_Group, uint Id_Sender)
         {
             string sql;
             if (StartMessageId == 0)
             {
-                 sql = "SELECT `Id`, `Id_User`, `Id_Group`, `Sent`, `TextBody`,`Edited`, `Id_Attachment`  FROM `Message` " +
-                    "LEFT JOIN `Message_Attachment` ON Message.Id = Message_Attachment.Id_Message " +
-                    "WHERE `Message`.`Id_Group` = @Id_Group " +
-                    "ORDER BY `Message`.`Id` DESC LIMIT @Length;";
+                sql = "SELECT `Id`, `Id_User`, `Id_Group`, `Sent`, `TextBody`,`Edited`, `Id_Attachment`  FROM `Message` " +
+                   "LEFT JOIN `Message_Attachment` ON Message.Id = Message_Attachment.Id_Message " +
+                   "WHERE `Message`.`Id_Group` = @Id_Group " +
+                   "ORDER BY `Message`.`Id` ASC LIMIT @Length;";
             }
             else
             {
                 sql = "SELECT `Id`, `Id_User`, `Id_Group`, `Sent`, `TextBody`,`Edited`, `Id_Attachment`  FROM `Message` " +
                     "LEFT JOIN `Message_Attachment` ON Message.Id = Message_Attachment.Id_Message " +
                     "WHERE `Message`.`Id_Group` = @Id_Group AND `Message`.`Id` <= @StartId " +
-                    "ORDER BY `Message`.`Id` DESC LIMIT @Length;";
+                    "ORDER BY `Message`.`Id` ASC LIMIT @Length;";
             }
-            List<SingleMessage> result = ReadToSingleMessage(db.ExecuteReader(sql, new Dictionary<string, object>() { { "Id_Group", Id_Group }, { "StartId", StartMessageId }, { "Length", Length } }));
+            List<SingleMessage> result = ReadToSingleMessage(db.ExecuteReader(sql, new Dictionary<string, object>() { { "Id_Group", Id_Group }, { "StartId", StartMessageId }, { "Length", Length } }), Id_Sender);
             return result;
         }
-        public List<SingleMessage> GetNewMessages(DateTime OldestMessage, List<uint> FromGroups)
+        public List<SingleMessage> GetNewMessages(DateTime OldestMessage, List<uint> FromGroups, uint Id_Sender)
         {
             string groups = "0";
             foreach (var item in FromGroups)
@@ -120,11 +123,23 @@ namespace REST_API.Repositories
             string sql = "SELECT `Id`, `Id_User`, `Id_Group`, `Sent`, `TextBody`,`Edited`, `Id_Attachment` FROM `Message` " +
                 "LEFT JOIN `Message_Attachment` ON Message.Id = Message_Attachment.Id_Message " +
                 "WHERE `Sent` >= @OldestDate and (" + groups + ") ";
-            return ReadToSingleMessage(db.ExecuteReader(sql, new Dictionary<string, object>() { { "OldestDate", OldestMessage } }));
+            return ReadToSingleMessage(db.ExecuteReader(sql, new Dictionary<string, object>() { { "OldestDate", OldestMessage } }), Id_Sender);
+        }
+        public List<SingleMessage> GetNewMessages(ulong Id_Last, List<uint> FromGroups, uint Id_Sender)
+        {
+            string groups = "0";
+            foreach (var item in FromGroups)
+            {
+                groups += " or `Id_Group` = " + item;
+            }
+            string sql = "SELECT `Id`, `Id_User`, `Id_Group`, `Sent`, `TextBody`,`Edited`, `Id_Attachment` FROM `Message` " +
+                "LEFT JOIN `Message_Attachment` ON Message.Id = Message_Attachment.Id_Message " +
+                "WHERE `Id` > @LastId and (" + groups + ") ";
+            return ReadToSingleMessage(db.ExecuteReader(sql, new Dictionary<string, object>() { { "LastId", Id_Last} }), Id_Sender);
         }
 
         //IMPORTANT: MySqlDataReader has to be ordered by Message.Id!
-        private List<SingleMessage> ReadToSingleMessage(MySqlDataReader reader)
+        private List<SingleMessage> ReadToSingleMessage(MySqlDataReader reader, uint Id_Sender)
         {
             List<Tuple<uint, SingleMessage>> messages = new List<Tuple<uint, SingleMessage>>();
             ulong prevId = 0;
@@ -144,7 +159,8 @@ namespace REST_API.Repositories
                         Id_Group = reader.GetUInt32("Id_Group"),
                         Text = reader.GetString("TextBody"),
                         Id_Attachment = new List<uint>(),
-                        Edited = reader.GetBoolean("Edited")
+                        Edited = reader.GetBoolean("Edited"),
+                        UserIsSender = reader.GetUInt32("Id_User") == Id_Sender
                     };
                     var attachment = reader["Id_Attachment"];
                     if (attachment != DBNull.Value)

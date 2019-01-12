@@ -14,5 +14,6 @@ namespace REST_API.Models.Api.Message
         public uint Id_Group { get; set; }
         public UserInfo UserInfo { get; set; }
         public DateTime Sent { get; set; }
+        public bool UserIsSender { get; set; }
     }
 }

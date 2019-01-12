@@ -136,7 +136,7 @@ namespace REST_API.Controllers
             }
             try
             {
-                List<SingleMessage> messages = repository.GetMessages(getMessage.StartId, getMessage.Amount, getMessage.Id_Group);
+                List<SingleMessage> messages = repository.GetMessages(getMessage.StartId, getMessage.Amount, getMessage.Id_Group, Id_User);
                 return new Response() { StatusCode = Models.Enums.StatusCode.OK, Data = messages };
             }
             catch (MySql.Data.MySqlClient.MySqlException ex)
@@ -144,6 +144,27 @@ namespace REST_API.Controllers
                 return new Response() { StatusCode = Models.Enums.StatusCode.DATABASE_ERROR };
                 throw ex;
             }
+        }
+        [HttpPost]
+        public Response GetNewMessages(GetNewMessages getNewMessages)
+        {
+            uint Id_User = ((UserPrincipal)User).DbUser.Id;
+            if (getNewMessages.Groups == null)
+            {
+                getNewMessages.Groups = new List<uint>();
+                userRepository.GetGroups(Id_User).ForEach((a) => getNewMessages.Groups.Add(a.Id_Group));
+            }
+            foreach (var item in getNewMessages.Groups)
+            {
+                if (!InGroup(Id_User, item))
+                {
+                    return new Response() { StatusCode = Models.Enums.StatusCode.FORBIDDEN };
+
+                }
+            }
+            List<SingleMessage> result = repository.GetNewMessages(getNewMessages.Id_Last, getNewMessages.Groups, Id_User);
+
+            return new Response() { StatusCode = Models.Enums.StatusCode.OK, Data = result };
         }
         /// <summary>
         /// Sets a message state to recieved or seen (Seen = false -> recieved, Seen = true -> recieved and seen).
@@ -177,6 +198,7 @@ namespace REST_API.Controllers
             }
             return new Response() { StatusCode = Models.Enums.StatusCode.OK };
         }
+        /*
         /// <summary>
         /// Returns new messages.
         /// </summary>
@@ -198,7 +220,7 @@ namespace REST_API.Controllers
                 return new Response() { StatusCode = Models.Enums.StatusCode.DATABASE_ERROR };
                 throw ex;
             }
-        }
+        }*/
         private bool InGroup(uint Id_User, uint Id_Group)
         {
             foreach (var item in userRepository.GetGroups(Id_User))
