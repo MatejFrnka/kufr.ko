@@ -115,7 +115,38 @@ namespace REST_API.Controllers
             return response;
         }
 
+        [HttpGet]
 
+
+
+        /// <summary>
+        /// Checks if attachment already exists in the database
+        /// </summary>
+        /// <param name="hash">MD5 Hash of the attachment</param>
+        /// <returns>Response with ID of the attachment if attachment exists, otherwise null</returns>
+        public Response AttachmentExists(string hash)
+        {
+            Response response = new Response();
+            try
+            {
+                uint? id = attachmentRepository.FindIdByHash(hash);
+                if (id != null)
+                {
+                    response.Data = id;
+                }
+                else
+                {
+                    response.Data = null;
+                }
+
+                response.StatusCode = Models.Enums.StatusCode.OK;
+            }
+            catch (Exception)
+            {
+                response.StatusCode = Models.Enums.StatusCode.DATABASE_ERROR;
+            }
+            return response;
+        }
 
 
         /// <summary>
@@ -134,5 +165,6 @@ namespace REST_API.Controllers
                 }
             }
         }
+        
     }
 }
