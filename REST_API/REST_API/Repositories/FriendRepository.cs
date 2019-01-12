@@ -24,12 +24,12 @@ namespace REST_API.Repositories
         }
         public List<UserPublic> FindAcceptedFriends(uint userId)
         {
-            List<UserPublic> Friends = ReadToUserList(this.db.ExecuteReader("SELECT f.Id_UserSender as Id, u.Name, u.Id_Attachment FROM FriendRequest f INNER JOIN User u ON u.Id = f.Id_UserSender WHERE f.Id_UserReceiver = @userId AND f.State='ACCEPTED' UNION SELECT f.Id_UserReceiver as Id, u.Name, u.Id_Attachment FROM FriendRequest f INNER JOIN User u ON u.Id = f.Id_UserReceiver WHERE f.Id_UserSender = @userId AND f.State='ACCEPTED'", new Dictionary<string, object>() { { "userId", userId }}));
+            List<UserPublic> Friends = ReadToUserList(this.db.ExecuteReader("SELECT f.Id_UserSender as Id, u.Name, u.Id_Attachment, u.LastOnline FROM FriendRequest f INNER JOIN User u ON u.Id = f.Id_UserSender WHERE f.Id_UserReceiver = @userId AND f.State='ACCEPTED' UNION SELECT f.Id_UserReceiver as Id, u.Name, u.Id_Attachment, u.LastOnline FROM FriendRequest f INNER JOIN User u ON u.Id = f.Id_UserReceiver WHERE f.Id_UserSender = @userId AND f.State='ACCEPTED'", new Dictionary<string, object>() { { "userId", userId }}));
             return Friends;
         }
         public List<UserPublic> FindByState(uint userId, FriendRequestState state)
         {
-            List<UserPublic> Friends = ReadToUserList(this.db.ExecuteReader("SELECT f.Id_UserSender as Id, u.Name, u.Id_Attachment FROM FriendRequest f INNER JOIN User u ON u.Id = f.Id_UserReceiver WHERE f.Id_UserReceiver = @userId AND f.State = @state", new Dictionary<string, object>() { { "userId", userId }, {"state", state.ToString() } }));
+            List<UserPublic> Friends = ReadToUserList(this.db.ExecuteReader("SELECT f.Id_UserSender as Id, u.Name, u.Id_Attachment, u.LastOnline FROM FriendRequest f INNER JOIN User u ON u.Id = f.Id_UserReceiver WHERE f.Id_UserReceiver = @userId AND f.State = @state", new Dictionary<string, object>() { { "userId", userId }, {"state", state.ToString() } }));
             return Friends;
         }
         private List<FriendRequest> ReadToFriendList(MySqlDataReader reader)
@@ -58,7 +58,8 @@ namespace REST_API.Repositories
                 {
                     Id = reader.GetUInt32("Id"),
                     Name = reader.GetString("Name"),
-                    Id_Attachment = reader.GetUInt32("Id_Attachment")
+                    Id_Attachment = reader.GetUInt32("Id_Attachment"),
+                    LastOnline = reader.GetDateTime("LastOnline")
                 };
                 result.Add(u);
             }
