@@ -157,7 +157,7 @@ namespace REST_API.Repositories
                         Id = currId,
                         Sent = reader.GetDateTime("Sent"),
                         Id_Group = reader.GetUInt32("Id_Group"),
-                        Text = reader.GetString("TextBody"),
+                        Text = reader.IsDBNull(reader.GetOrdinal("TextBody"))?"" : reader.GetString("TextBody"),
                         Id_Attachment = new List<uint>(),
                         Edited = reader.GetBoolean("Edited"),
                         UserIsSender = reader.GetUInt32("Id_User") == Id_Sender
