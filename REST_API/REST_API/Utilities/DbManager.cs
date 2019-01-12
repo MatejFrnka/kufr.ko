@@ -10,6 +10,7 @@ namespace REST_API.Utilities
     {
         //Database=chat;Data Source=kufrko-rest-api-mysqldbserver.mysql.database.azure.com;User Id=kufrko@kufrko-rest-api-mysqldbserver;Password=mH$D62d)^*uNO*B*0gW5uIeL7
         private const string connectionString = "server=kufrko-rest-api-mysqldbserver.mysql.database.azure.com;uid=kufrko@kufrko-rest-api-mysqldbserver;pwd=mH$D62d)^*uNO*B*0gW5uIeL7;database=chat";
+        //private const string connectionString = "server=mysqlstudenti.litv.sssvt.cz;uid=frnkamatej;pwd=123456;database=3b1_frnkamatej_db2";
         private MySqlConnection conn;
 
         public DbManager()
