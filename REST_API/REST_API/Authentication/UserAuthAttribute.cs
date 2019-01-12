@@ -25,21 +25,33 @@ namespace REST_API.Authentication
                 token = tokenHeader.FirstOrDefault();
 
             if (token == null)
+            {
                 context.ErrorResult = new AuthFailResponse(Models.Enums.StatusCode.INVALID_REQUEST);
+                return;
+            }
 
             DbManager dbManager = new DbManager();
             TokenRepository tokenRepository = new TokenRepository(dbManager);
             
             Token dbToken = tokenRepository.FindByValue(token);
 
-            if(dbToken == null)
+            if (dbToken == null)
+            {
                 context.ErrorResult = new AuthFailResponse(Models.Enums.StatusCode.TOKEN_INVALID);
+                return;
+            }
 
-            if(!dbToken.Active)
+            if (!dbToken.Active)
+            {
                 context.ErrorResult = new AuthFailResponse(Models.Enums.StatusCode.TOKEN_INACTIVE);
+                return;
+            }
 
-            if(dbToken.ExpireDate < DateTime.Now)
+            if (dbToken.ExpireDate < DateTime.Now)
+            {
                 context.ErrorResult = new AuthFailResponse(Models.Enums.StatusCode.TOKEN_EXPIRED);
+                return;
+            }
 
             UserRepository userRepository = new UserRepository(dbManager);
             
@@ -47,7 +59,10 @@ namespace REST_API.Authentication
 
 
             if (dbUser == null)
+            {
                 context.ErrorResult = new AuthFailResponse(Models.Enums.StatusCode.TOKEN_INVALID);
+                return;
+            }
 
             userRepository.UpdateLastOnline(dbUser.Id);
             context.Principal = new UserPrincipal(dbUser);
