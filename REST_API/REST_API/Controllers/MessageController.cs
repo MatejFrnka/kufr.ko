@@ -205,7 +205,7 @@ namespace REST_API.Controllers
         {
             uint Id_User = ((UserPrincipal)User).DbUser.Id;
             Response response = new Response();
-            AttachmentMessage attachmentMessage = attachmentRepository.FindByPrimaryKeysSecure(attachmentRequest.Id_Attachment, attachmentRequest.Id_Message,Id_User);
+            AttachmentMessage attachmentMessage = attachmentRepository.FindByPrimaryKeysSecure(attachmentRequest.Id_Message,attachmentRequest.Id_Attachment ,Id_User);
 
             if (attachmentMessage == null)
             {
