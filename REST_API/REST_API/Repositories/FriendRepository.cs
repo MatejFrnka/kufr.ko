@@ -29,12 +29,12 @@ namespace REST_API.Repositories
         }
         public List<UserPublic> SearchPossibleFriends(uint userId, string fulltext)
         {
-            List<UserPublic> friends = ReadToUserList(this.db.ExecuteReader("SELECT u.Id, u.Name, u.Id_Attachment FROM User u LEFT JOIN (SELECT f.Id_UserSender as Id FROM FriendRequest f INNER JOIN User u ON u.Id = f.Id_UserSender WHERE f.Id_UserReceiver = @userId UNION SELECT f.Id_UserReceiver as Id FROM FriendRequest f INNER JOIN User u ON u.Id = f.Id_UserReceiver WHERE f.Id_UserSender = @userId) friends ON friends.Id = u.Id WHERE u.Visibility = 'PUBLIC' AND (instr(u.Name,@fulltext) OR u.Email = @fulltext) AND friends.Id is null", new Dictionary<string, object>() { { "userId", userId }, { "fulltext", fulltext } }));
+            List<UserPublic> friends = ReadToUserListNotFriends(this.db.ExecuteReader("SELECT u.Id, u.Name, u.Id_Attachment FROM User u LEFT JOIN (SELECT f.Id_UserSender as Id FROM FriendRequest f INNER JOIN User u ON u.Id = f.Id_UserSender WHERE f.Id_UserReceiver = @userId UNION SELECT f.Id_UserReceiver as Id FROM FriendRequest f INNER JOIN User u ON u.Id = f.Id_UserReceiver WHERE f.Id_UserSender = @userId) friends ON friends.Id = u.Id WHERE u.Visibility = 'PUBLIC' AND (instr(u.Name,@fulltext) OR u.Email = @fulltext) AND friends.Id is null", new Dictionary<string, object>() { { "userId", userId }, { "fulltext", fulltext } }));
             return friends;
         }
         public List<UserPublic> FindByState(uint userId, FriendRequestState state)
         {
-            List<UserPublic> friends = ReadToUserList(this.db.ExecuteReader("SELECT f.Id_UserSender as Id, u.Name, u.Id_Attachment, u.LastOnline FROM FriendRequest f INNER JOIN User u ON u.Id = f.Id_UserReceiver WHERE f.Id_UserReceiver = @userId AND f.State = @state", new Dictionary<string, object>() { { "userId", userId }, {"state", state.ToString() } }));
+            List<UserPublic> friends = ReadToUserListNotFriends(this.db.ExecuteReader("SELECT f.Id_UserSender as Id, u.Name, u.Id_Attachment FROM FriendRequest f INNER JOIN User u ON u.Id = f.Id_UserReceiver WHERE f.Id_UserReceiver = @userId AND f.State = @state", new Dictionary<string, object>() { { "userId", userId }, {"state", state.ToString() } }));
             return friends;
         }
         //private List<FriendRequest> ReadToFriendList(MySqlDataReader reader)
@@ -66,6 +66,23 @@ namespace REST_API.Repositories
                     Id_Attachment = reader.GetUInt32("Id_Attachment"),
                     LastOnline = reader.IsDBNull(reader.GetOrdinal("LastOnline")) ? (DateTime?) null : reader.GetDateTime("LastOnline"),
                     DefaultGroup = reader.IsDBNull(reader.GetInt32("GroupId")) ? (uint?)null : reader.GetUInt32("GroupId")
+                };
+                result.Add(u);
+            }
+
+            reader.Close();
+            return result;
+        }
+        private List<UserPublic> ReadToUserListNotFriends(MySqlDataReader reader)
+        {
+            List<UserPublic> result = new List<UserPublic>();
+            while (reader.Read())
+            {
+                UserPublic u = new UserPublic()
+                {
+                    Id = reader.GetUInt32("Id"),
+                    Name = reader.GetString("Name"),
+                    Id_Attachment = reader.GetUInt32("Id_Attachment")
                 };
                 result.Add(u);
             }
