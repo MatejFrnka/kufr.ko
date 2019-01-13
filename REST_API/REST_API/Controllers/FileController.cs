@@ -22,7 +22,7 @@ namespace REST_API.Controllers
         private UserRepository userRepository;
         private AttachmentRepository attachmentRepository;
         private uint userId;
-        private const string path = @"D:\kufrko\attachdb\";
+        private const string path = @"\attachdb\";
 
         public FileController()
         {
@@ -48,7 +48,7 @@ namespace REST_API.Controllers
             return Convert.ToBase64String(bytes);
         }
         [HttpGet]
-        public Response LoadAttachment(UInt32 IdAttachment)
+        public Response LoadAttachment(uint IdAttachment)
         {
             try
             {
@@ -63,19 +63,13 @@ namespace REST_API.Controllers
                     string attachmentFullPath = path + IdAttachment;
                     if (File.Exists(attachmentFullPath))
                     {
-                        AttachmentData attachmentData = new AttachmentData();
-                        attachmentData.Info = attachment;
-                        attachmentData.Data = LoadFile(attachmentFullPath);
-                        response.Data = attachmentData;
+                        response.Data = LoadFile(attachmentFullPath);
                         response.StatusCode = Models.Enums.StatusCode.OK;
                     }
                     else
                     {
                         response.StatusCode = Models.Enums.StatusCode.DATABASE_ERROR;
                     }
-
-                    
-                    
                 }
                 return response;
             }
@@ -84,26 +78,44 @@ namespace REST_API.Controllers
                 return new Response() { StatusCode = Models.Enums.StatusCode.DATABASE_ERROR };
             }
         }
+
+        //[HttpGet]
+        //public Response LoadAttachmentInfo(uint IdAttachment)
+        //{
+        //    Response response = new Response();
+        //    AttachmentMessage attachment = attachmentRepository.FindByIdSecure(IdAttachment, userId);
+        //    if (attachment == null)
+        //    {
+        //        response.StatusCode = Models.Enums.StatusCode.INVALID_REQUEST;
+        //    }
+        //    else
+        //    {
+        //        response.Data = attachment;
+        //        response.StatusCode = Models.Enums.StatusCode.OK;
+        //    }
+        //    return response;
+        //}
+
         [HttpPost]
         
-        public Response SaveAttachment(AttachmentData attachment)
+        public Response SaveAttachment(string attachment)
         {
             Response response = new Response();
             try
             {
-                byte[] bytes = Convert.FromBase64String(attachment.Data);
+                byte[] bytes = Convert.FromBase64String(attachment);
                 var md5 = HashAlgorithm.Create();
-                attachment.Info.Hash = BitConverter.ToString(md5.ComputeHash(bytes)).Replace("-", "").ToLowerInvariant();
-                uint? id = attachmentRepository.FindIdByHash(attachment.Info.Hash);
+                string hash = BitConverter.ToString(md5.ComputeHash(bytes)).Replace("-", "").ToLowerInvariant();
+                uint? id = attachmentRepository.FindIdByHash(hash);
                 if (id!=null)
                 {
                     response.Data = id;
                 }
                 else
                 {
-                    id= attachmentRepository.CreateAttachment(attachment.Info);
+                    id = attachmentRepository.CreateAttachment(hash);
                     response.Data = id;
-                    File.WriteAllBytes(id.ToString(), bytes);
+                    File.WriteAllBytes(path+id.ToString(), bytes);
                 }
                 
                 response.StatusCode = Models.Enums.StatusCode.OK;
@@ -149,22 +161,22 @@ namespace REST_API.Controllers
         }
 
 
-        /// <summary>
-        /// Returns MD5 hash for file specified in <paramref name="filename"/>
-        /// </summary>
-        /// <param name="filename">Path to file that will be loaded to calculate the hash</param>
-        /// <returns>The MD5 hash of the file represented in string</returns>
-        private string CalculateMD5(string filename)
-        {
-            using (var md5 = MD5.Create())
-            {
-                using (var stream = File.OpenRead(filename))
-                {
-                    var hash = md5.ComputeHash(stream);
-                    return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
-                }
-            }
-        }
+        ///// <summary>
+        ///// Returns MD5 hash for file specified in <paramref name="filename"/>
+        ///// </summary>
+        ///// <param name="filename">Path to file that will be loaded to calculate the hash</param>
+        ///// <returns>The MD5 hash of the file represented in string</returns>
+        //private string CalculateMD5(string filename)
+        //{
+        //    using (var md5 = MD5.Create())
+        //    {
+        //        using (var stream = File.OpenRead(filename))
+        //        {
+        //            var hash = md5.ComputeHash(stream);
+        //            return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+        //        }
+        //    }
+        //}
         private static string GetMime(string filename)
         {
             if (filename.Contains('.'))

@@ -16,17 +16,17 @@ namespace REST_API.Repositories
         {
             this.db = dbManager;
         }
-        public List<Attachment> FindByMessageId(ulong Id_Message)
+        public List<AttachmentMessage> FindByMessageIdSecure(ulong Id_Message, uint Id_User)
         {
-            string sql = "SELECT Id, Path, Mime FROM `Message_Attachment` INNER JOIN `Attachment` ON Message_Attachment.Id_Attachment = Attachment.Id WHERE Id_Message = @Id_Message";
+            string sql = "SELECT ma.Id_Attachment, ma.Filename, ma.Mime FROM Message_Attachment ma INNER JOIN Message m on ma.Id_Message = m.Id INNER JOIN Group_User gu on gu.Id_Group = m.Id_Group WHERE Id_Message = @Id_Message AND gu.Id_User = @Id_User";
 
-            return this.ReadToList(db.ExecuteReader(sql, new Dictionary<string, object>() { {"Id_Message", Id_Message } }));
+            return this.ReadToListAM(db.ExecuteReader(sql, new Dictionary<string, object>() { {"Id_Message", Id_Message }, { "Id_User", Id_User } }));
         }
         public Attachment FindByIdSecure(uint Id_Attachment,uint Id_User)
         {
-            string sql = "SELECT a.Path, a.Mime FROM Attachment a INNER JOIN Message_Attachment ma on ma.Id_Attachment = a.Id INNER JOIN Message m on ma.Id_Message = m.Id INNER JOIN Group_User gu on gu.Id_Group = m.Id_Group WHERE a.Id = @Id_Attachment AND gu.Id_User = @Id_User";
+            string sql = "SELECT a.Hash FROM Attachment a INNER JOIN Message_Attachment ma on ma.Id_Attachment = a.Id INNER JOIN Message m on ma.Id_Message = m.Id INNER JOIN Group_User gu on gu.Id_Group = m.Id_Group WHERE a.Id = @Id_Attachment AND gu.Id_User = @Id_User";
 
-            return this.ReadToObject(db.ExecuteReader(sql, new Dictionary<string, object>() { { "Id_Attachment", Id_Attachment }, { "Id_User", Id_User } }));
+            return this.ReadToObject(db.ExecuteReader(sql, new Dictionary<string, object>() { { "Id_Attachment", Id_Attachment }, { "Id_User", Id_User } }),Id_Attachment);
         }
         public uint FindIdByHash(string Hash)
         {
@@ -34,27 +34,26 @@ namespace REST_API.Repositories
 
             return (uint)db.ExecuteScalar(sql, new Dictionary<string, object>() { { "Hash", Hash } });
         }
-        public uint CreateAttachment(Attachment attachment)
+        public uint CreateAttachment(string hash)
         {
-            string sql = "INSERT INTO Attachment(Filename,Mime,Hash) @filename, @mime, @hash; SELECT SCOPE_IDENTITY()";
+            string sql = "INSERT INTO Attachment(Hash) @hash; SELECT SCOPE_IDENTITY()";
 
-            return (uint)this.db.ExecuteScalar(sql, new Dictionary<string, object>() { { "filename", attachment.Filename }, { "mime", attachment.Mime }, { "hash", attachment.Hash } });
+            return (uint)this.db.ExecuteScalar(sql, new Dictionary<string, object>() { { "hash", hash } });
 
         }
         
 
-        private List<Attachment> ReadToList(MySqlDataReader reader)
+        private List<AttachmentMessage> ReadToListAM(MySqlDataReader reader)
         {
-            List<Attachment> result = new List<Attachment>();
+            List<AttachmentMessage> result = new List<AttachmentMessage>();
 
             while (reader.Read())
             {
-                result.Add(new Attachment()
+                result.Add(new AttachmentMessage()
                 {
-                    Id = reader.GetUInt32("Id"),
+                    Id_Attachment = reader.GetUInt32("Id"),
                     Mime = reader.GetString("Mime"),
-                    Filename = reader.GetString("Filename"),
-                    Hash = reader.GetString("Hash")
+                    Filename = reader.GetString("Filename")
                 });
             }
             reader.Close();
@@ -62,12 +61,10 @@ namespace REST_API.Repositories
             return result;
         }
         
-        private Attachment ReadToObject(MySqlDataReader reader)
+        private Attachment ReadToObject(MySqlDataReader reader, uint Id)
         {
             Attachment result = new Attachment();
-            result.Mime = reader.GetString("Mime");
-            result.Filename = reader.GetString("Filename");
-            result.Id = reader.GetUInt32("Id");
+            result.Id = Id;
             result.Hash = reader.GetString("Hash");
             reader.Close();
             return result;

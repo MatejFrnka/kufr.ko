@@ -8,7 +8,7 @@ namespace REST_API.Models.Api.Attachments
 {
     public class AttachmentData
     {
-        public Attachment Info { get; set; }
+        public AttachmentMessage MessageInfo { get; set; }
         public string Data { get; set; }
     }
 }
