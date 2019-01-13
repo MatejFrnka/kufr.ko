@@ -29,7 +29,7 @@ namespace REST_API.Repositories
         }
         public List<UserPublic> SearchPossibleFriends(uint userId, string fulltext)
         {
-            List<UserPublic> friends = ReadToUserList(this.db.ExecuteReader("SELECT u.Id, u.Name, u.Id_Attachment FROM User u LEFT JOIN (SELECT f.Id_UserSender as Id FROM FriendRequest f INNER JOIN User u ON u.Id = f.Id_UserSender WHERE f.Id_UserReceiver = 1 UNION SELECT f.Id_UserReceiver as Id FROM FriendRequest f INNER JOIN User u ON u.Id = f.Id_UserReceiver WHERE f.Id_UserSender = 1) friends ON friends.Id = u.Id WHERE u.Visibility = 'PUBLIC' AND (instr(u.Name,'test') OR u.Email = 'test') AND friends.Id is null", new Dictionary<string, object>() { { "Id", userId } }));
+            List<UserPublic> friends = ReadToUserList(this.db.ExecuteReader("SELECT u.Id, u.Name, u.Id_Attachment FROM User u LEFT JOIN (SELECT f.Id_UserSender as Id FROM FriendRequest f INNER JOIN User u ON u.Id = f.Id_UserSender WHERE f.Id_UserReceiver = @userId UNION SELECT f.Id_UserReceiver as Id FROM FriendRequest f INNER JOIN User u ON u.Id = f.Id_UserReceiver WHERE f.Id_UserSender = @userId) friends ON friends.Id = u.Id WHERE u.Visibility = 'PUBLIC' AND (instr(u.Name,@fulltext) OR u.Email = @fulltext) AND friends.Id is null", new Dictionary<string, object>() { { "Id", userId } }));
             return friends;
         }
         public List<UserPublic> FindByState(uint userId, FriendRequestState state)
