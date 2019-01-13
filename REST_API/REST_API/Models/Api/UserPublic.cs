@@ -11,6 +11,6 @@ namespace REST_API.Models.Database
         public string Name { get; set; }
         public uint Id_Attachment { get; set; }
         public DateTime? LastOnline { get; set; }
-        public uint DefaultGroup { get; set; }
+        public uint? DefaultGroup { get; set; }
     }
 }

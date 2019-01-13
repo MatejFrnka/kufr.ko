@@ -46,6 +46,24 @@ namespace REST_API.Controllers
             }
         }
         [HttpGet]
+        public Response SearchNewFriends(string fulltext)
+        {
+            userId = ((UserPrincipal)User).DbUser.Id;
+            try
+            {
+                List<UserPublic> friends = friendRepository.SearchPossibleFriends(userId,fulltext);
+                Response response = new Response();
+                response.StatusCode = Models.Enums.StatusCode.OK;
+                response.Data = friends;
+                return response;
+            }
+            catch (Exception)
+            {
+                return new Response() { StatusCode = Models.Enums.StatusCode.DATABASE_ERROR };
+                throw;
+            }
+        }
+        [HttpGet]
         public Response LoadPending()
         {
             userId = ((UserPrincipal)User).DbUser.Id;
