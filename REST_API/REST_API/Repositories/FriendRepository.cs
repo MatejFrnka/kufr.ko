@@ -37,23 +37,23 @@ namespace REST_API.Repositories
             List<UserPublic> friends = ReadToUserList(this.db.ExecuteReader("SELECT f.Id_UserSender as Id, u.Name, u.Id_Attachment, u.LastOnline FROM FriendRequest f INNER JOIN User u ON u.Id = f.Id_UserReceiver WHERE f.Id_UserReceiver = @userId AND f.State = @state", new Dictionary<string, object>() { { "userId", userId }, {"state", state.ToString() } }));
             return friends;
         }
-        private List<FriendRequest> ReadToFriendList(MySqlDataReader reader)
-        {
-            List<FriendRequest> result = new List<FriendRequest>();
-            while (reader.Read())
-            {
-                FriendRequest friendRequest = new FriendRequest()
-                {
-                    Id_UserSender = reader.GetUInt32("Id_UserSender"),
-                    Id_UserReceiver = reader.GetUInt32("Id_UserReceiver"),
-                    State = (FriendRequestState)Enum.Parse(typeof(FriendRequestState), reader.GetString("State")),
-                };
-                result.Add(friendRequest);
-            }
+        //private List<FriendRequest> ReadToFriendList(MySqlDataReader reader)
+        //{
+        //    List<FriendRequest> result = new List<FriendRequest>();
+        //    while (reader.Read())
+        //    {
+        //        FriendRequest friendRequest = new FriendRequest()
+        //        {
+        //            Id_UserSender = reader.GetUInt32("Id_UserSender"),
+        //            Id_UserReceiver = reader.GetUInt32("Id_UserReceiver"),
+        //            State = (FriendRequestState)Enum.Parse(typeof(FriendRequestState), reader.GetString("State")),
+        //        };
+        //        result.Add(friendRequest);
+        //    }
 
-            reader.Close();
-            return result;
-        }
+        //    reader.Close();
+        //    return result;
+        //}
         private List<UserPublic> ReadToUserList(MySqlDataReader reader)
         {
             List<UserPublic> result = new List<UserPublic>();
@@ -73,17 +73,17 @@ namespace REST_API.Repositories
             reader.Close();
             return result;
         }
-        private List<uint> ReadToIdList(MySqlDataReader reader)
-        {
-            List<uint> result = new List<uint>();
-            while (reader.Read())
-            {
-                result.Add(reader.GetUInt32("FriendId"));
-            }
+        //private List<uint> ReadToIdList(MySqlDataReader reader)
+        //{
+        //    List<uint> result = new List<uint>();
+        //    while (reader.Read())
+        //    {
+        //        result.Add(reader.GetUInt32("FriendId"));
+        //    }
 
-            reader.Close();
-            return result;
-        }
+        //    reader.Close();
+        //    return result;
+        //}
         public bool CreateRequest(uint IdFrom,uint IdTo)
         {
             string sql = "INSERT INTO FriendRequest(Id_UserSender, Id_UserReceiver) SELECT @IdFrom,@IdTo FROM User WHERE Id = @IdTo AND Visibility = 'PUBLIC'";
