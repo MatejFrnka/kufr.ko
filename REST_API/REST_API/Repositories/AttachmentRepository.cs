@@ -26,7 +26,7 @@ namespace REST_API.Repositories
         {
             string sql = "SELECT a.Path, a.Mime FROM Attachment a INNER JOIN Message_Attachment ma on ma.Id_Attachment = a.Id INNER JOIN Message m on ma.Id_Message = m.Id INNER JOIN Group_User gu on gu.Id_Group = m.Id_Group WHERE a.Id = @Id_Attachment AND gu.Id_User = @Id_User";
 
-            return this.ReadToObject(db.ExecuteReader(sql, new Dictionary<string, object>() { { "Id_Attachment", Id_Attachment } }));
+            return this.ReadToObject(db.ExecuteReader(sql, new Dictionary<string, object>() { { "Id_Attachment", Id_Attachment }, { "Id_User", Id_User } }));
         }
         public uint FindIdByHash(string Hash)
         {
@@ -36,9 +36,9 @@ namespace REST_API.Repositories
         }
         public uint CreateAttachment(Attachment attachment)
         {
-            string sql = "INSERT INTO Attachment(Filename,Mime,Hash) @attachment.Filename, @attachment.Mime, @attachment.Hash; SELECT SCOPE_IDENTITY()";
+            string sql = "INSERT INTO Attachment(Filename,Mime,Hash) @filename, @mime, @hash; SELECT SCOPE_IDENTITY()";
 
-            return (uint)this.db.ExecuteScalar(sql, new Dictionary<string, object>());
+            return (uint)this.db.ExecuteScalar(sql, new Dictionary<string, object>() { { "filename", attachment.Filename }, { "mime", attachment.Mime }, { "hash", attachment.Hash } });
 
         }
         
@@ -67,7 +67,7 @@ namespace REST_API.Repositories
             Attachment result = new Attachment();
             result.Mime = reader.GetString("Mime");
             result.Filename = reader.GetString("Filename");
-            result.Id = Convert.ToUInt32(reader.GetString("Id"));
+            result.Id = reader.GetUInt32("Id");
             result.Hash = reader.GetString("Hash");
             reader.Close();
             return result;
