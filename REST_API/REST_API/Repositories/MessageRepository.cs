@@ -101,14 +101,14 @@ namespace REST_API.Repositories
                 sql = "SELECT `Id`, `Id_User`, `Id_Group`, `Sent`, `TextBody`,`Edited`, `Id_Attachment`  FROM `Message` " +
                    "LEFT JOIN `Message_Attachment` ON Message.Id = Message_Attachment.Id_Message " +
                    "WHERE `Message`.`Id_Group` = @Id_Group " +
-                   "ORDER BY `Message`.`Id` ASC LIMIT @Length;";
+                   "ORDER BY `Message`.`Id` DESC LIMIT @Length;";
             }
             else
             {
                 sql = "SELECT `Id`, `Id_User`, `Id_Group`, `Sent`, `TextBody`,`Edited`, `Id_Attachment`  FROM `Message` " +
                     "LEFT JOIN `Message_Attachment` ON Message.Id = Message_Attachment.Id_Message " +
-                    "WHERE `Message`.`Id_Group` = @Id_Group AND `Message`.`Id` <= @StartId " +
-                    "ORDER BY `Message`.`Id` ASC LIMIT @Length;";
+                    "WHERE `Message`.`Id_Group` = @Id_Group AND `Message`.`Id` < @StartId " +
+                    "ORDER BY `Message`.`Id` DESC LIMIT @Length;";
             }
             List<SingleMessage> result = ReadToSingleMessage(db.ExecuteReader(sql, new Dictionary<string, object>() { { "Id_Group", Id_Group }, { "StartId", StartMessageId }, { "Length", Length } }), Id_Sender);
             return result;
@@ -157,7 +157,7 @@ namespace REST_API.Repositories
                         Id = currId,
                         Sent = reader.GetDateTime("Sent"),
                         Id_Group = reader.GetUInt32("Id_Group"),
-                        Text = reader.GetString("TextBody"),
+                        Text = reader.IsDBNull(reader.GetOrdinal("TextBody"))?"" : reader.GetString("TextBody"),
                         Id_Attachment = new List<uint>(),
                         Edited = reader.GetBoolean("Edited"),
                         UserIsSender = reader.GetUInt32("Id_User") == Id_Sender
