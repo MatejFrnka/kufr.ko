@@ -59,7 +59,8 @@ namespace REST_API.Repositories
                     Id = reader.GetUInt32("Id"),
                     Name = reader.GetString("Name"),
                     Id_Attachment = reader.GetUInt32("Id_Attachment"),
-                    LastOnline = reader.GetDateTime("LastOnline")
+                    LastOnline = reader.GetDateTime("LastOnline"),
+                    DefaultGroup = reader.GetUInt32("GroupId")
                 };
                 result.Add(u);
             }
