@@ -22,6 +22,12 @@ namespace REST_API.Repositories
 
             return this.ReadToListAM(db.ExecuteReader(sql, new Dictionary<string, object>() { {"Id_Message", Id_Message }, { "Id_User", Id_User } }));
         }
+        public AttachmentMessage FindByPrimaryKeysSecure(ulong Id_Message,uint Id_Attachment, uint Id_User)
+        {
+            string sql = "SELECT ma.Filename, ma.Mime FROM Message_Attachment ma INNER JOIN Message m on ma.Id_Message = m.Id INNER JOIN Group_User gu on gu.Id_Group = m.Id_Group WHERE Id_Message = @Id_Message AND Id_Attachment = @Id_Attachment AND gu.Id_User = @Id_User";
+
+            return this.ReadToObjectAM(db.ExecuteReader(sql, new Dictionary<string, object>() { { "Id_Message", Id_Message }, { "Id_User", Id_User }, { "Id_Attachment", Id_Attachment } }),Id_Attachment);
+        }
         public Attachment FindByIdSecure(uint Id_Attachment,uint Id_User)
         {
             string sql = "SELECT a.Hash FROM Attachment a INNER JOIN Message_Attachment ma on ma.Id_Attachment = a.Id INNER JOIN Message m on ma.Id_Message = m.Id INNER JOIN Group_User gu on gu.Id_Group = m.Id_Group WHERE a.Id = @Id_Attachment AND gu.Id_User = @Id_User";
@@ -66,6 +72,15 @@ namespace REST_API.Repositories
             Attachment result = new Attachment();
             result.Id = Id;
             result.Hash = reader.GetString("Hash");
+            reader.Close();
+            return result;
+        }
+        private AttachmentMessage ReadToObjectAM(MySqlDataReader reader, uint Id)
+        {
+            AttachmentMessage result = new AttachmentMessage();
+            result.Id_Attachment = Id;
+            result.Filename = reader.GetString("Filename");
+            result.Mime = reader.GetString("Mime");
             reader.Close();
             return result;
         }

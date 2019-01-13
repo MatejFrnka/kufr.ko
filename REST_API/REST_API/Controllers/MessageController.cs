@@ -12,6 +12,7 @@ using REST_API.Utilities;
 using REST_API.Models.Enums;
 using REST_API.Authentication;
 using REST_API.Models.Database;
+using REST_API.Models.Api.Attachments;
 
 namespace REST_API.Controllers
 {
@@ -21,6 +22,7 @@ namespace REST_API.Controllers
 
         MessageRepository repository = new MessageRepository(new DbManager());
         UserRepository userRepository = new UserRepository(new DbManager());
+        AttachmentRepository attachmentRepository = new AttachmentRepository(new DbManager());
         /// <summary>
         /// Adds a message to target group.
         /// </summary>
@@ -197,6 +199,24 @@ namespace REST_API.Controllers
                 }
             }
             return new Response() { StatusCode = Models.Enums.StatusCode.OK };
+        }
+        [HttpGet]
+        public Response LoadAttachmentInfo(AttachmentRequest attachmentRequest)
+        {
+            uint Id_User = ((UserPrincipal)User).DbUser.Id;
+            Response response = new Response();
+            AttachmentMessage attachmentMessage = attachmentRepository.FindByPrimaryKeysSecure(attachmentRequest.Id_Attachment, attachmentRequest.Id_Message,Id_User);
+
+            if (attachmentMessage == null)
+            {
+                response.StatusCode = Models.Enums.StatusCode.INVALID_REQUEST;
+            }
+            else
+            {
+                response.Data = attachmentMessage;
+                response.StatusCode = Models.Enums.StatusCode.OK;
+            }
+            return response;
         }
         /*
         /// <summary>
