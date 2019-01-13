@@ -79,7 +79,7 @@ namespace REST_API.Controllers
             }
             try
             {
-                repository.EditMessage(editMessage);
+                repository.EditMessage(editMessage,Id_User);
                 return new Response() { StatusCode = Models.Enums.StatusCode.OK };
             }
             catch (MySql.Data.MySqlClient.MySqlException ex)

@@ -69,11 +69,11 @@ namespace REST_API.Repositories
             }
             db.ExecuteNonQuery(sql, new Dictionary<string, object>() { { "Id_Message", messageState.Id_Message }, { "Id_User", Id_Sender }, { "Seen", messageState.Seen } });
         }
-        public void EditMessage(EditMessage editMessage)
+        public void EditMessage(EditMessage editMessage, uint User_Id)
         {
             if (editMessage.Text != null)
             {
-                bool File = attachmentRepository.FindByMessageId(editMessage.Id_Message).Count > 0;
+                bool File = attachmentRepository.FindByMessageIdSecure(editMessage.Id_Message,User_Id).Count > 0;
 
                 string sql = "INSERT INTO `MessageHistory` SELECT null as `Id`,  `Id` as `Id_Message`, `TextBody`, @File as `File`, now() as `ChangedTime` FROM `Message` WHERE `Id` = @Id_Message;";
                 db.ExecuteNonQuery(sql, new Dictionary<string, object>() { { "Id_Message", editMessage.Id_Message }, { "File", File } });
