@@ -28,7 +28,7 @@ namespace REST_API.Repositories
 
         public GroupDetailInfo FindByIdInfo(uint groupId,uint userId)
         {
-            string sql = "SELECT g.Id, g.GroupName, g.HistoryVisibility, g.Id_Attachment,IF(gu.id = @uid,gu.IgnoreExpire,NULL) AS IgnoreExpire,IF(g.GroupName IS NOT NULL,g.GroupName,(SELECT GROUP_CONCAT(IF(gu.Nickname IS NULL, uu.Name, gu.Nickname) SEPARATOR ', ') FROM Group_User gu INNER JOIN User uu ON uu.Id = gu.Id_User WHERE gu.Id_Group = g.Id AND gu.Id_User != @uid)) AS DisplayName,gu.Id_User,gu.Id_Group,gu.Nickname,u.Name,gu.Permission FROM `Group` g INNER JOIN Group_User gu ON gu.Id_Group = g.Id INNER JOIN User u ON u.Id = gu.Id_User WHERE (SELECT COUNT(guu.Id_User) FROM Group_User guu WHERE guu.Id_Group = g.Id AND guu.Id_User = @uid) > 0 AND g.Id = @gid ORDER BY g.Id";
+            string sql = "SELECT g.Id, g.GroupName, g.HistoryVisibility, g.Id_Attachment,IF(gu.Id_User = @uid,gu.IgnoreExpire,NULL) AS IgnoreExpire,IF(g.GroupName IS NOT NULL,g.GroupName,(SELECT GROUP_CONCAT(IF(gu.Nickname IS NULL, uu.Name, gu.Nickname) SEPARATOR ', ') FROM Group_User gu INNER JOIN User uu ON uu.Id = gu.Id_User WHERE gu.Id_Group = g.Id AND gu.Id_User != @uid)) AS DisplayName,gu.Id_User,gu.Id_Group,gu.Nickname,u.Name,gu.Permission FROM `Group` g INNER JOIN Group_User gu ON gu.Id_Group = g.Id INNER JOIN User u ON u.Id = gu.Id_User WHERE (SELECT COUNT(guu.Id_User) FROM Group_User guu WHERE guu.Id_Group = g.Id AND guu.Id_User = @uid) > 0 AND g.Id = @gid ORDER BY g.Id";
 
             List<GroupDetailInfo> result = this.ReadToListGroupDetailInfo(this.db.ExecuteReader(sql, new Dictionary<string, object>() { { "uid", userId }, {"gid", groupId } }));
 
