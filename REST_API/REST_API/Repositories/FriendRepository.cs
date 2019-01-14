@@ -103,9 +103,9 @@ namespace REST_API.Repositories
         //}
         public bool CreateRequest(uint IdFrom,uint IdTo)
         {
-            string sql = "INSERT INTO FriendRequest(Id_UserSender, Id_UserReceiver) SELECT @IdFrom,@IdTo FROM User WHERE Id = @IdTo AND Visibility = 'PUBLIC'";
+            string sql = "INSERT INTO FriendRequest(Id_UserSender, Id_UserReceiver) SELECT @IdFrom, @IdTo FROM User u WHERE u.Id = @IdTo AND u.Visibility = 'PUBLIC'";
 
-            if (this.db.ExecuteNonQuery(sql, new Dictionary<string, object>() { { "Id_From", IdFrom }, { "Id_To", IdTo } })==1)
+            if (this.db.ExecuteNonQuery(sql, new Dictionary<string, object>() { { "IdFrom", IdFrom }, { "IdTo", IdTo } })==1)
             {
                 return true;
             }
