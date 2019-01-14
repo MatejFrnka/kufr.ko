@@ -133,7 +133,7 @@ namespace REST_API.Repositories
         {
             string sql = "DELETE FROM FriendRequest WHERE Id_UserSender = @IdFrom AND Id_UserReceiver = @IdTo";
 
-            if (this.db.ExecuteNonQuery(sql, new Dictionary<string, object>() { { "Id_UserSender", IdFrom }, { "Id_UserReceiver", IdTo } }) == 1)
+            if (this.db.ExecuteNonQuery(sql, new Dictionary<string, object>() { { "IdFrom", IdFrom }, { "IdTo", IdTo } }) == 1)
             {
                 return true;
             }
