@@ -64,12 +64,30 @@ namespace REST_API.Controllers
             }
         }
         [HttpGet]
-        public Response LoadPending()
+        public Response LoadPendingToMe()
         {
             userId = ((UserPrincipal)User).DbUser.Id;
             try
             {
-                List<UserPublic> friends = friendRepository.FindByState(userId,FriendRequestState.PENDING);
+                List<UserPublic> friends = friendRepository.FindByStateToUser(userId,FriendRequestState.PENDING);
+                Response response = new Response();
+                response.StatusCode = Models.Enums.StatusCode.OK;
+                response.Data = friends;
+                return response;
+            }
+            catch (Exception)
+            {
+                return new Response() { StatusCode = Models.Enums.StatusCode.DATABASE_ERROR };
+                throw;
+            }
+        }
+        [HttpGet]
+        public Response LoadPendingFromMe()
+        {
+            userId = ((UserPrincipal)User).DbUser.Id;
+            try
+            {
+                List<UserPublic> friends = friendRepository.FindByStateFromUser(userId, FriendRequestState.PENDING);
                 Response response = new Response();
                 response.StatusCode = Models.Enums.StatusCode.OK;
                 response.Data = friends;
@@ -87,7 +105,7 @@ namespace REST_API.Controllers
             userId = ((UserPrincipal)User).DbUser.Id;
             try
             {
-                List<UserPublic> friends = friendRepository.FindByState(userId,FriendRequestState.BLOCKED);
+                List<UserPublic> friends = friendRepository.FindByStateToUser(userId,FriendRequestState.BLOCKED);
                 Response response = new Response();
                 response.StatusCode = Models.Enums.StatusCode.OK;
                 response.Data = friends;
