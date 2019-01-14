@@ -80,5 +80,25 @@ namespace REST_API.Controllers
 
             return new Response() { StatusCode = Models.Enums.StatusCode.OK, Data = info };
         }
+
+        [HttpPost]
+        public Response Create()
+        {
+            uint id = 0;
+
+            try
+            {
+                id = this.groupRepository.CreateForUserWithDefaults(((UserPrincipal)User).DbUser.Id);
+            }
+            catch (MySqlException)
+            {
+                return new Response() { StatusCode = Models.Enums.StatusCode.DATABASE_ERROR };
+            }
+
+            if (id == 0)
+                return new Response() { StatusCode = Models.Enums.StatusCode.DATABASE_ERROR };
+
+            return new Response() { StatusCode = Models.Enums.StatusCode.OK, Data = id };
+        }
     }
 }

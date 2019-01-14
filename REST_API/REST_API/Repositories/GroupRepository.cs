@@ -45,15 +45,17 @@ namespace REST_API.Repositories
             //return this.ReadToList(this.db.ExecuteReader("SELECT g.* FROM `Group` g INNER JOIN Group_User u ON g.Id = u.Id_Group LEFT JOIN Message m ON m.Id_Group = g.Id WHERE u.Id_User = @uid GROUP BY(g.Id) ORDER BY MAX(m.Id) DESC", new Dictionary<string, object>() { { "uid", userId } }));
         }
 
-        public void CreateForUserWithDefaults(Group group,uint userId)
+        public uint CreateForUserWithDefaults(uint userId)
         {
-            string sql = "INSERT INTO `Group`(GroupName, HistoryVisibility, Id_Attachment) VALUES (@gname,@vis,@idA) SELECT LAST_INSERT_ID()";
+            string sql = "INSERT INTO `Group`(HistoryVisibility) VALUES (0); SELECT LAST_INSERT_ID();";
 
-            uint gId = (uint) this.db.ExecuteScalar(sql, new Dictionary<string, object>() { { "gname", group.GroupName }, { "vis",group.HistoryVisibility }, { "idA",group.Id_Attachment } });
+            uint gId = Convert.ToUInt32(this.db.ExecuteScalar(sql, new Dictionary<string, object>()));
 
             string sql2 = "INSERT INTO Group_User(Id_User, Id_Group, Permission) VALUES (@uid,@gid,'OWNER')";
 
             this.db.ExecuteNonQuery(sql2, new Dictionary<string, object>() { { "uid", userId },{ "gid", gId } });
+
+            return gId;
         }
 
         private List<GroupDetailInfo> ReadToListGroupDetailInfo(MySqlDataReader reader)
