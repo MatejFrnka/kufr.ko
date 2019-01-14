@@ -32,9 +32,14 @@ namespace REST_API.Repositories
             List<UserPublic> friends = ReadToUserListNotFriends(this.db.ExecuteReader("SELECT u.Id, u.Name, u.Id_Attachment FROM User u LEFT JOIN (SELECT f.Id_UserSender as Id FROM FriendRequest f INNER JOIN User u ON u.Id = f.Id_UserSender WHERE f.Id_UserReceiver = @userId UNION SELECT f.Id_UserReceiver as Id FROM FriendRequest f INNER JOIN User u ON u.Id = f.Id_UserReceiver WHERE f.Id_UserSender = @userId) friends ON friends.Id = u.Id WHERE u.Visibility = 'PUBLIC' AND (instr(u.Name,@fulltext) OR u.Email = @fulltext) AND friends.Id is null", new Dictionary<string, object>() { { "userId", userId }, { "fulltext", fulltext } }));
             return friends;
         }
-        public List<UserPublic> FindByState(uint userId, FriendRequestState state)
+        public List<UserPublic> FindByStateToUser(uint userId, FriendRequestState state)
         {
-            List<UserPublic> friends = ReadToUserListNotFriends(this.db.ExecuteReader("SELECT f.Id_UserSender as Id, u.Name, u.Id_Attachment FROM FriendRequest f INNER JOIN User u ON u.Id = f.Id_UserReceiver WHERE f.Id_UserReceiver = @userId AND f.State = @state", new Dictionary<string, object>() { { "userId", userId }, {"state", state.ToString() } }));
+            List<UserPublic> friends = ReadToUserListNotFriends(this.db.ExecuteReader("SELECT f.Id_UserSender as Id, u.Name, u.Id_Attachment FROM FriendRequest f INNER JOIN User u ON u.Id = f.Id_UserSender WHERE f.Id_UserReceiver = @userId AND f.State = @state", new Dictionary<string, object>() { { "userId", userId }, {"state", state.ToString() } }));
+            return friends;
+        }
+        public List<UserPublic> FindByStateFromUser(uint userId, FriendRequestState state)
+        {
+            List<UserPublic> friends = ReadToUserListNotFriends(this.db.ExecuteReader("SELECT f.Id_UserReceiver as Id, u.Name, u.Id_Attachment FROM FriendRequest f INNER JOIN User u ON u.Id = f.Id_UserReceiver WHERE f.Id_UserSender = @userId AND f.State = @state", new Dictionary<string, object>() { { "userId", userId }, { "state", state.ToString() } }));
             return friends;
         }
         //private List<FriendRequest> ReadToFriendList(MySqlDataReader reader)
