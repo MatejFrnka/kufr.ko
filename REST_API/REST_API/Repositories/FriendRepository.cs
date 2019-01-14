@@ -119,7 +119,7 @@ namespace REST_API.Repositories
         {
             string sql = "UPDATE FriendRequest SET State = @state WHERE Id_UserSender = @IdFrom AND Id_UserReceiver = @IdTo";
 
-            if (this.db.ExecuteNonQuery(sql, new Dictionary<string, object>() { { "Id_UserSender", IdFrom }, { "Id_UserReceiver", IdTo }, { "state", action.ToString() } }) == 1)
+            if (this.db.ExecuteNonQuery(sql, new Dictionary<string, object>() { { "IdFrom", IdFrom }, { "IdTo", IdTo }, { "state", action.ToString() } }) == 1)
             {
                 return true;
             }
