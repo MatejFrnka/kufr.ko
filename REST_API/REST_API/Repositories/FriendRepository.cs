@@ -105,7 +105,7 @@ namespace REST_API.Repositories
         {
             string sql = "INSERT INTO FriendRequest(Id_UserSender, Id_UserReceiver) SELECT @IdFrom,@IdTo FROM User WHERE Id = @IdTo AND Visibility = 'PUBLIC'";
 
-            if (this.db.ExecuteNonQuery(sql, new Dictionary<string, object>() { { "Id_UserSender", IdFrom }, { "Id_UserReceiver", IdTo } })==1)
+            if (this.db.ExecuteNonQuery(sql, new Dictionary<string, object>() { { "Id_From", IdFrom }, { "Id_To", IdTo } })==1)
             {
                 return true;
             }
@@ -117,7 +117,7 @@ namespace REST_API.Repositories
         }
         public bool RespondToRequest(uint IdFrom, uint IdTo,FriendRequestState action)
         {
-            string sql = "UPDATE FriendRequest SET State = @action WHERE Id_UserSender = @IdFrom AND Id_UserReceiver = @IdTo";
+            string sql = "UPDATE FriendRequest SET State = @state WHERE Id_UserSender = @IdFrom AND Id_UserReceiver = @IdTo";
 
             if (this.db.ExecuteNonQuery(sql, new Dictionary<string, object>() { { "Id_UserSender", IdFrom }, { "Id_UserReceiver", IdTo }, { "state", action.ToString() } }) == 1)
             {
