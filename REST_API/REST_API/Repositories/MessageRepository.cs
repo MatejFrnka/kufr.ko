@@ -51,23 +51,20 @@ namespace REST_API.Repositories
                 }
             }
         }
-        public void SetMessageState(uint Id_Sender, SetMessageState messageState)
+        public void SetMessageState(uint Id_Sender, ulong Id_Message, bool Seen)
         {
             string sql;
-            bool? seen = GetMessageState(Id_Sender, messageState.Id_Message);
-            if (seen != null && (seen == messageState.Seen || (bool)seen && !messageState.Seen))
+            uint group = GetMessageGroup(Id_Message);
+            sql = "INSERT INTO `messagestate` (select m.Id as Id_Message, 1 as Id_User,0 as Seen from message as m left join messagestate as s on m.Id = s.Id_Message " +
+                "where m.Id_Group = @IdGroup and s.Id_Message is null and m.Id <= @IdMessage)";
+            db.ExecuteNonQuery(sql, new Dictionary<string, object> { { "IdGroup", group }, { "IdMessage", Id_Message } });
+
+            if (Seen)
             {
-                return;
+                sql = "UPDATE `messagestate` inner join message on message.Id = messagestate.Id_Message SET `Seen`=1 WHERE messagestate.Seen = 0 and messagestate.Id_User = @IdUser and message.Id_Group = @IdGroup and message.Id <= @IdMessage";
+                db.ExecuteNonQuery(sql, new Dictionary<string, object>() { { "IdMessage", Id_Message }, { "@IdUser", Id_Sender }, {"@IdGroup", group } });
             }
-            if (seen != null)
-            {
-                sql = "UPDATE `MessageState` SET `Seen`= 1 WHERE `Id_Message`= @Id_Message and `Id_User`= @Id_User";
-            }
-            else
-            {
-                sql = "INSERT INTO `MessageState`(`Id_Message`, `Id_User`, `Seen`) VALUES (@Id_Message, @Id_User, @Seen)";
-            }
-            db.ExecuteNonQuery(sql, new Dictionary<string, object>() { { "Id_Message", messageState.Id_Message }, { "Id_User", Id_Sender }, { "Seen", messageState.Seen } });
+            
         }
         public void EditMessage(EditMessage editMessage, uint User_Id)
         {
@@ -137,7 +134,21 @@ namespace REST_API.Repositories
                 "WHERE `Id` > @LastId and (" + groups + ") ";
             return ReadToSingleMessage(db.ExecuteReader(sql, new Dictionary<string, object>() { { "LastId", Id_Last} }), Id_Sender);
         }
+        private uint GetMessageGroup(ulong Id_Message)
+        {
+            string sql = "SELECT `Id_Group` FROM `message` WHERE `Id` = @Id_Message";
 
+            MySqlDataReader reader = db.ExecuteReader(sql, new Dictionary<string, object> { { "Id_Message", Id_Message } });
+            uint? res = null;
+            while (reader.Read())
+            {
+                res = reader.GetUInt32("Id_Group");
+            }
+            reader.Close();
+            if(res == null)
+                throw new Exception("No message with given id");
+            return (uint)res;
+        }
         //IMPORTANT: MySqlDataReader has to be ordered by Message.Id!
         private List<SingleMessage> ReadToSingleMessage(MySqlDataReader reader, uint Id_Sender)
         {

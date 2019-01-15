@@ -79,7 +79,7 @@ namespace REST_API.Controllers
             }
             try
             {
-                repository.EditMessage(editMessage,Id_User);
+                repository.EditMessage(editMessage, Id_User);
                 return new Response() { StatusCode = Models.Enums.StatusCode.OK };
             }
             catch (MySql.Data.MySqlClient.MySqlException ex)
@@ -103,7 +103,7 @@ namespace REST_API.Controllers
             {
                 return new Response() { StatusCode = Models.Enums.StatusCode.INVALID_REQUEST };
             }
-            if (!this.InGroup(Id_User,message.Id_Group))
+            if (!this.InGroup(Id_User, message.Id_Group))
             {
                 return new Response() { StatusCode = Models.Enums.StatusCode.FORBIDDEN };
             }
@@ -139,6 +139,7 @@ namespace REST_API.Controllers
             try
             {
                 List<SingleMessage> messages = repository.GetMessages(getMessage.StartId, getMessage.Amount, getMessage.Id_Group, Id_User);
+                this.repository.SetMessageState(Id_User, messages.Last().Id, false);
                 return new Response() { StatusCode = Models.Enums.StatusCode.OK, Data = messages };
             }
             catch (MySql.Data.MySqlClient.MySqlException ex)
@@ -165,7 +166,7 @@ namespace REST_API.Controllers
                 }
             }
             List<SingleMessage> result = repository.GetNewMessages(getNewMessages.Id_Last, getNewMessages.Groups, Id_User);
-
+            this.repository.SetMessageState(Id_User, result.Last().Id, false);
             return new Response() { StatusCode = Models.Enums.StatusCode.OK, Data = result };
         }
         /// <summary>
@@ -174,29 +175,22 @@ namespace REST_API.Controllers
         /// <param name="setMessageState">List of <see cref="Models.Api.Message.SetMessageState"/></param>
         /// <returns>Returns a <see cref="Models.Enums.StatusCode"/></returns>
         [HttpPost]
-        public Response SetMessageState(List<SetMessageState> setMessageState)
+        public Response SetMessageState(ulong Id_Message, bool Seen)
         {
             uint Id_User = ((UserPrincipal)User).DbUser.Id;
-            if (setMessageState == null || setMessageState.Count == 0)
+            if (Id_Message == 0)
             {
                 return new Response() { StatusCode = Models.Enums.StatusCode.INVALID_REQUEST };
             }
-            foreach (var item in setMessageState)
+            if (repository.FindById(Id_Message).Id_User != Id_User)
+                return new Response() { StatusCode = Models.Enums.StatusCode.FORBIDDEN };
+            try
             {
-                if(repository.FindById(item.Id_Message).Id_User != Id_User)
-                    return new Response() { StatusCode = Models.Enums.StatusCode.FORBIDDEN };
+                repository.SetMessageState(Id_User, Id_Message, Seen);
             }
-            foreach (var item in setMessageState)
+            catch (MySql.Data.MySqlClient.MySqlException)
             {
-                try
-                {
-                    repository.SetMessageState(Id_User, item);
-                }
-                catch (MySql.Data.MySqlClient.MySqlException ex)
-                {
-                    return new Response() { StatusCode = Models.Enums.StatusCode.DATABASE_ERROR };
-                    throw ex;
-                }
+                return new Response() { StatusCode = Models.Enums.StatusCode.DATABASE_ERROR };
             }
             return new Response() { StatusCode = Models.Enums.StatusCode.OK };
         }
@@ -205,7 +199,7 @@ namespace REST_API.Controllers
         {
             uint Id_User = ((UserPrincipal)User).DbUser.Id;
             Response response = new Response();
-            AttachmentMessage attachmentMessage = attachmentRepository.FindByPrimaryKeysSecure(attachmentRequest.Id_Message,attachmentRequest.Id_Attachment ,Id_User);
+            AttachmentMessage attachmentMessage = attachmentRepository.FindByPrimaryKeysSecure(attachmentRequest.Id_Message, attachmentRequest.Id_Attachment, Id_User);
 
             if (attachmentMessage == null)
             {
