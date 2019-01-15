@@ -195,21 +195,29 @@ namespace REST_API.Controllers
             return new Response() { StatusCode = Models.Enums.StatusCode.OK };
         }
         [HttpGet]
-        public Response LoadAttachmentInfo(AttachmentRequest attachmentRequest)
+        public Response LoadAttachmentInfo(ulong Id_Message, uint Id_Attachment)
         {
             uint Id_User = ((UserPrincipal)User).DbUser.Id;
             Response response = new Response();
-            AttachmentMessage attachmentMessage = attachmentRepository.FindByPrimaryKeysSecure(attachmentRequest.Id_Message, attachmentRequest.Id_Attachment, Id_User);
+            try
+            {
+                AttachmentMessage attachmentMessage = attachmentRepository.FindByPrimaryKeysSecure(Id_Message, Id_Attachment, Id_User);
 
-            if (attachmentMessage == null)
-            {
-                response.StatusCode = Models.Enums.StatusCode.INVALID_REQUEST;
+                if (attachmentMessage == null)
+                {
+                    response.StatusCode = Models.Enums.StatusCode.INVALID_REQUEST;
+                }
+                else
+                {
+                    response.Data = attachmentMessage;
+                    response.StatusCode = Models.Enums.StatusCode.OK;
+                }
             }
-            else
+            catch (Exception)
             {
-                response.Data = attachmentMessage;
-                response.StatusCode = Models.Enums.StatusCode.OK;
+                response.StatusCode = Models.Enums.StatusCode.DATABASE_ERROR;
             }
+            
             return response;
         }
         /*
