@@ -28,7 +28,7 @@ namespace REST_API.Repositories
 
         public GroupDetailInfo FindByIdInfo(uint groupId,uint userId)
         {
-            string sql = "SELECT g.Id, g.GroupName, g.HistoryVisibility, g.Id_Attachment,IF(gu.Id_User = @uid,gu.IgnoreExpire,NULL) AS IgnoreExpire,IF(g.GroupName IS NOT NULL,g.GroupName,(SELECT GROUP_CONCAT(IF(gu.Nickname IS NULL, uu.Name, gu.Nickname) SEPARATOR ', ') FROM Group_User gu INNER JOIN User uu ON uu.Id = gu.Id_User WHERE gu.Id_Group = g.Id AND gu.Id_User != @uid)) AS DisplayName,gu.Id_User,gu.Id_Group,gu.Nickname,u.Name,gu.Permission FROM `Group` g INNER JOIN Group_User gu ON gu.Id_Group = g.Id INNER JOIN User u ON u.Id = gu.Id_User WHERE (SELECT COUNT(guu.Id_User) FROM Group_User guu WHERE guu.Id_Group = g.Id AND guu.Id_User = @uid) > 0 AND g.Id = @gid ORDER BY g.Id";
+            string sql = "SELECT g.Id, g.GroupName, g.HistoryVisibility, g.Id_Attachment,IF(gu.Id_User = @uid,gu.IgnoreExpire,NULL) AS IgnoreExpire,IF(f.State IS NULL,0,f.State = 'BLOCKED') AS Blocked,IF(g.GroupName IS NOT NULL,g.GroupName,(SELECT GROUP_CONCAT(IF(gu.Nickname IS NULL, uu.Name, gu.Nickname) SEPARATOR ', ') FROM Group_User gu INNER JOIN User uu ON uu.Id = gu.Id_User WHERE gu.Id_Group = g.Id AND gu.Id_User != @uid)) AS DisplayName,gu.Id_User,gu.Id_Group,gu.Nickname,u.Name,gu.Permission FROM `Group` g INNER JOIN Group_User gu ON gu.Id_Group = g.Id INNER JOIN User u ON u.Id = gu.Id_User LEFT JOIN friendrequest f ON g.Id = f.Id_Group WHERE (SELECT COUNT(guu.Id_User) FROM Group_User guu WHERE guu.Id_Group = g.Id AND guu.Id_User = @uid) > 0 AND g.Id = @gid ORDER BY g.Id";
 
             List<GroupDetailInfo> result = this.ReadToListGroupDetailInfo(this.db.ExecuteReader(sql, new Dictionary<string, object>() { { "uid", userId }, {"gid", groupId } }));
 
@@ -79,6 +79,7 @@ namespace REST_API.Repositories
                         GroupName = reader.IsDBNull(reader.GetOrdinal("GroupName")) ? null : reader.GetString("GroupName"),
                         HistoryVisibility = reader.GetBoolean("HistoryVisibility"),
                         Id_Attachment = reader.GetUInt32("Id_Attachment"),
+                        ReadOnly = reader.GetBoolean("Blocked"),
                         DisplayName = reader.IsDBNull(reader.GetOrdinal("DisplayName")) ? "Pouze já" : reader.GetString("DisplayName"),
                         Users = new List<Group_UserInfo>()
                     };
