@@ -32,7 +32,7 @@ namespace REST_API.Controllers
                 repository.Update(user);
                 return new Response() { StatusCode = Models.Enums.StatusCode.OK };
             }
-            catch (MySql.Data.MySqlClient.MySqlException ex)
+            catch (MySql.Data.MySqlClient.MySqlException)
             {
                 return new Response() { StatusCode = Models.Enums.StatusCode.DATABASE_ERROR };
             }
@@ -49,7 +49,7 @@ namespace REST_API.Controllers
                 repository.Update(user);
                 return new Response() { StatusCode = Models.Enums.StatusCode.OK };
             }
-            catch (MySql.Data.MySqlClient.MySqlException ex)
+            catch (MySql.Data.MySqlClient.MySqlException)
             {
                 return new Response() { StatusCode = Models.Enums.StatusCode.DATABASE_ERROR };
 
@@ -70,7 +70,7 @@ namespace REST_API.Controllers
                 repository.Update(user);
                 return new Response() { StatusCode = Models.Enums.StatusCode.OK };
             }
-            catch (MySql.Data.MySqlClient.MySqlException ex)
+            catch (MySql.Data.MySqlClient.MySqlException)
             {
                 return new Response() { StatusCode = Models.Enums.StatusCode.DATABASE_ERROR };
 
