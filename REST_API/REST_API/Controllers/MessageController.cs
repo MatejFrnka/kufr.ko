@@ -184,14 +184,7 @@ namespace REST_API.Controllers
             }
             if (repository.FindById(Id_Message).Id_User != Id_User)
                 return new Response() { StatusCode = Models.Enums.StatusCode.FORBIDDEN };
-            try
-            {
                 repository.SetMessageState(Id_User, Id_Message, Seen);
-            }
-            catch (MySql.Data.MySqlClient.MySqlException)
-            {
-                return new Response() { StatusCode = Models.Enums.StatusCode.DATABASE_ERROR };
-            }
             return new Response() { StatusCode = Models.Enums.StatusCode.OK };
         }
         [HttpGet]
