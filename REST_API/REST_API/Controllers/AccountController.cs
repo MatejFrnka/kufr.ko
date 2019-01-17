@@ -70,5 +70,19 @@ namespace REST_API.Controllers
                 return new Response() { StatusCode = Models.Enums.StatusCode.DATABASE_ERROR };
             }
         }
+        [HttpGet]
+        public Response DeleteSelf()
+        {
+            uint Id_User = ((UserPrincipal)User).DbUser.Id;
+            try
+            {
+                repository.Delete(Id_User);
+            }
+            catch (MySql.Data.MySqlClient.MySqlException)
+            {
+                return new Response() { StatusCode = Models.Enums.StatusCode.DATABASE_ERROR };
+            }
+            return new Response { StatusCode = Models.Enums.StatusCode.OK };
+        }
     }
 }

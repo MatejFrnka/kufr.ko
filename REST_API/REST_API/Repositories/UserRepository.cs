@@ -18,7 +18,12 @@ namespace REST_API.Repositories
         {
             this.db = dbManager;
         }
+        public void Delete(uint id)
+        {
+            string sql = "DELETE * FROM `user` WHERE `Id` = @Id_User";
 
+            db.ExecuteNonQuery(sql, new Dictionary<string, object>() { {"Id_User", id} });
+        }
         public User FindById(uint id)
         {
             List<User> result = this.ReadToList(this.db.ExecuteReader("SELECT * FROM User WHERE Id = @id", new Dictionary<string, object>() { { "id", id } }));
