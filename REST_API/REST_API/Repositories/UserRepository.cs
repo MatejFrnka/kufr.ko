@@ -20,7 +20,7 @@ namespace REST_API.Repositories
         }
         public void Delete(uint id)
         {
-            string sql = "DELETE * FROM `user` WHERE `Id` = @Id_User";
+            string sql = "DELETE FROM `user` WHERE `Id` = @Id_User";
 
             db.ExecuteNonQuery(sql, new Dictionary<string, object>() { {"Id_User", id} });
         }
