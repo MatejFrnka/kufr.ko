@@ -22,6 +22,7 @@ namespace REST_API.Controllers
 
         MessageRepository repository = new MessageRepository(new DbManager());
         UserRepository userRepository = new UserRepository(new DbManager());
+        GroupRepository groupRepository = new GroupRepository(new DbManager());
         AttachmentRepository attachmentRepository = new AttachmentRepository(new DbManager());
         /// <summary>
         /// Adds a message to target group.
@@ -35,26 +36,24 @@ namespace REST_API.Controllers
             {
                 return new Response() { StatusCode = Models.Enums.StatusCode.INVALID_REQUEST };
             }
-            else
-            {
-                uint Id_User = ((UserPrincipal)User).DbUser.Id;
+            uint Id_User = ((UserPrincipal)User).DbUser.Id;
 
-                if (!InGroup(Id_User, sendMessage.Id_Group))
-                {
-                    return new Response() { StatusCode = Models.Enums.StatusCode.FORBIDDEN };
-                }
-                else
-                {
-                    try
-                    {
-                        ulong MessageId = repository.SendMessage(Id_User, sendMessage);
-                        return new Response() { StatusCode = Models.Enums.StatusCode.OK, Data = MessageId };
-                    }
-                    catch (MySql.Data.MySqlClient.MySqlException ex)
-                    {
-                        return new Response() { StatusCode = Models.Enums.StatusCode.DATABASE_ERROR };
-                    }
-                }
+            if (!InGroup(Id_User, sendMessage.Id_Group))
+            {
+                return new Response() { StatusCode = Models.Enums.StatusCode.FORBIDDEN };
+            }
+            if (groupRepository.FindByIdInfo(sendMessage.Id_Group, Id_User).ReadOnly)
+            {
+                return new Response() { StatusCode = Models.Enums.StatusCode.FORBIDDEN };
+            }
+            try
+            {
+                ulong MessageId = repository.SendMessage(Id_User, sendMessage);
+                return new Response() { StatusCode = Models.Enums.StatusCode.OK, Data = MessageId };
+            }
+            catch (MySql.Data.MySqlClient.MySqlException)
+            {
+                return new Response() { StatusCode = Models.Enums.StatusCode.DATABASE_ERROR };
             }
         }
 
@@ -139,7 +138,8 @@ namespace REST_API.Controllers
             try
             {
                 List<SingleMessage> messages = repository.GetMessages(getMessage.StartId, getMessage.Amount, getMessage.Id_Group, Id_User);
-                this.repository.SetMessageState(Id_User, messages.Last().Id, false);
+                if (messages.Count != 0)
+                    this.repository.SetMessageState(Id_User, messages.Last().Id, false);
                 return new Response() { StatusCode = Models.Enums.StatusCode.OK, Data = messages };
             }
             catch (MySql.Data.MySqlClient.MySqlException ex)
@@ -162,11 +162,11 @@ namespace REST_API.Controllers
                 if (!InGroup(Id_User, item))
                 {
                     return new Response() { StatusCode = Models.Enums.StatusCode.FORBIDDEN };
-
                 }
             }
             List<SingleMessage> result = repository.GetNewMessages(getNewMessages.Id_Last, getNewMessages.Groups, Id_User);
-            this.repository.SetMessageState(Id_User, result.Last().Id, false);
+            if (result.Count != 0)
+                this.repository.SetMessageState(Id_User, result.Last().Id, false);
             return new Response() { StatusCode = Models.Enums.StatusCode.OK, Data = result };
         }
         /// <summary>
@@ -184,7 +184,7 @@ namespace REST_API.Controllers
             }
             if (repository.FindById(Id_Message).Id_User != Id_User)
                 return new Response() { StatusCode = Models.Enums.StatusCode.FORBIDDEN };
-                repository.SetMessageState(Id_User, Id_Message, Seen);
+            repository.SetMessageState(Id_User, Id_Message, Seen);
             return new Response() { StatusCode = Models.Enums.StatusCode.OK };
         }
         [HttpGet]
@@ -210,7 +210,7 @@ namespace REST_API.Controllers
             {
                 response.StatusCode = Models.Enums.StatusCode.DATABASE_ERROR;
             }
-            
+
             return response;
         }
         /*

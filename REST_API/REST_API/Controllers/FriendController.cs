@@ -185,8 +185,6 @@ namespace REST_API.Controllers
                 {
                     response.StatusCode = Models.Enums.StatusCode.INVALID_REQUEST;
                 }
-
-
                 return response;
             }
             catch (Exception)
