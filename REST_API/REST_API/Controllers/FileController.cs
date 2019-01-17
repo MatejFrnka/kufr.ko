@@ -97,7 +97,7 @@ namespace REST_API.Controllers
         //}
 
         [HttpPost]
-        public Response SaveAttachment(AttachmentData attachment)
+        public Response SaveAttachment(AttachmentUpload attachment)
         {
             Response response = new Response();
             try
