@@ -108,7 +108,7 @@ namespace REST_API.Repositories
         //}
         public bool CreateRequest(uint IdFrom,uint IdTo)
         {
-            string sql = "INSERT INTO FriendRequest(Id_UserSender, Id_UserReceiver) SELECT @IdFrom, @IdTo FROM User u WHERE u.Id = @IdTo AND u.Visibility = 'PUBLIC'";
+            string sql = "INSERT INTO FriendRequest(Id_UserSender, Id_UserReceiver) SELECT @IdFrom, @IdTo FROM User u WHERE u.Id = 51 AND u.Visibility = 'PUBLIC' AND NOT EXISTS (SELECT 1 FROM FriendRequest f INNER JOIN User u ON u.Id = f.Id_UserReceiver INNER JOIN User u2 ON u2.Id = f.Id_UserSender WHERE (f.Id_UserReceiver = @IdFrom AND f.Id_UserSender = @IdTo) OR (f.Id_UserReceiver = @IdTo AND f.Id_UserSender = @IdFrom))";
 
             if (this.db.ExecuteNonQuery(sql, new Dictionary<string, object>() { { "IdFrom", IdFrom }, { "IdTo", IdTo } })==1)
             {
