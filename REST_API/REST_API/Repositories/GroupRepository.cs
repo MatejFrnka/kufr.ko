@@ -47,11 +47,28 @@ namespace REST_API.Repositories
 
         public uint CreateForUserWithDefaults(uint userId)
         {
-            string sql = "INSERT INTO `Group`(HistoryVisibility) VALUES (0); INSERT INTO Group_User(Id_User, Id_Group, Permission) SELECT @uid,LAST_INSERT_ID(),'OWNER'";
+            string sql = "INSERT INTO `Group`(HistoryVisibility) VALUES (0); SELECT LAST_INSERT_ID();";
 
-            return Convert.ToUInt32(this.db.ExecuteScalar(sql, new Dictionary<string, object>() { { "uid", userId } }));
+            uint gId = Convert.ToUInt32(this.db.ExecuteScalar(sql, new Dictionary<string, object>()));
+
+            string sql2 = "INSERT INTO Group_User(Id_User, Id_Group, Permission) VALUES (@uid,@gid,'OWNER')";
+
+            this.db.ExecuteNonQuery(sql2, new Dictionary<string, object>() { { "uid", userId }, { "gid", gId } });
+
+            return gId;
         }
+        public uint CreateForTwoUsersWithDefaults(uint userId, uint userId2)
+        {
+            string sql = "INSERT INTO 'Group' (HistoryVisibility) VALUES (0); SELECT LAST_INSERT_ID();";
 
+            uint gId = Convert.ToUInt32(this.db.ExecuteScalar(sql, new Dictionary<string, object>()));
+
+            string sql2 = "INSERT INTO Group_User(Id_User, Id_Group, Permission) VALUES (@uid,@gid,'OWNER'), (@uid2,@gid,'OWNER')";
+
+            this.db.ExecuteNonQuery(sql2, new Dictionary<string, object>() { { "uid", userId }, {"uid2", userId2 }, { "gid", gId } });
+
+            return gId;
+        }
         private List<GroupDetailInfo> ReadToListGroupDetailInfo(MySqlDataReader reader)
         {
             List<GroupDetailInfo> result = new List<GroupDetailInfo>();
