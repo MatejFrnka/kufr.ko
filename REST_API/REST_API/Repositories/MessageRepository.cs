@@ -1,5 +1,6 @@
 ﻿using MySql.Data.MySqlClient;
 using REST_API.Models.Api;
+using REST_API.Models.Api.Attachments;
 using REST_API.Models.Api.Message;
 using REST_API.Models.Database;
 using REST_API.Utilities;
@@ -95,14 +96,14 @@ namespace REST_API.Repositories
             string sql;
             if (StartMessageId == 0)
             {
-                sql = "SELECT `Id`, `Id_User`, `Id_Group`, `Sent`, `TextBody`,`Edited`, `Id_Attachment`  FROM `Message` " +
+                sql = "SELECT * FROM `Message` " +
                    "LEFT JOIN `Message_Attachment` ON Message.Id = Message_Attachment.Id_Message " +
                    "WHERE `Message`.`Id_Group` = @Id_Group " +
                    "ORDER BY `Message`.`Id` DESC LIMIT @Length;";
             }
             else
             {
-                sql = "SELECT `Id`, `Id_User`, `Id_Group`, `Sent`, `TextBody`,`Edited`, `Id_Attachment`  FROM `Message` " +
+                sql = "SELECT * FROM `Message` " +
                     "LEFT JOIN `Message_Attachment` ON Message.Id = Message_Attachment.Id_Message " +
                     "WHERE `Message`.`Id_Group` = @Id_Group AND `Message`.`Id` < @StartId " +
                     "ORDER BY `Message`.`Id` DESC LIMIT @Length;";
@@ -117,7 +118,7 @@ namespace REST_API.Repositories
             {
                 groups += " or `Id_Group` = " + item;
             }
-            string sql = "SELECT `Id`, `Id_User`, `Id_Group`, `Sent`, `TextBody`,`Edited`, `Id_Attachment` FROM `Message` " +
+            string sql = "SELECT * FROM `Message` " +
                 "LEFT JOIN `Message_Attachment` ON Message.Id = Message_Attachment.Id_Message " +
                 "WHERE `Sent` >= @OldestDate and (" + groups + ") ";
             return ReadToSingleMessage(db.ExecuteReader(sql, new Dictionary<string, object>() { { "OldestDate", OldestMessage } }), Id_Sender);
@@ -129,7 +130,7 @@ namespace REST_API.Repositories
             {
                 groups += " or `Id_Group` = " + item;
             }
-            string sql = "SELECT `Id`, `Id_User`, `Id_Group`, `Sent`, `TextBody`,`Edited`, `Id_Attachment` FROM `Message` " +
+            string sql = "SELECT * FROM `Message` " +
                 "LEFT JOIN `Message_Attachment` ON Message.Id = Message_Attachment.Id_Message " +
                 "WHERE `Id` > @LastId and (" + groups + ") ";
             return ReadToSingleMessage(db.ExecuteReader(sql, new Dictionary<string, object>() { { "LastId", Id_Last} }), Id_Sender);
@@ -159,7 +160,7 @@ namespace REST_API.Repositories
                 ulong currId = reader.GetUInt64("Id");
                 if (currId == prevId)
                 {
-                    messages.Last().Item2.Id_Attachment.Add(reader.GetUInt32("Id_Attachment"));
+                    messages.Last().Item2.Id_Attachment.Add(new AttachmentMessage() { Id_Attachment = reader.GetUInt32("Id_Attachment"), Filename = reader.GetString("Filename"), Mime = reader.GetString("Mime")});
                 }
                 else
                 {
@@ -169,14 +170,14 @@ namespace REST_API.Repositories
                         Sent = reader.GetDateTime("Sent"),
                         Id_Group = reader.GetUInt32("Id_Group"),
                         Text = reader.IsDBNull(reader.GetOrdinal("TextBody"))?"" : reader.GetString("TextBody"),
-                        Id_Attachment = new List<uint>(),
+                        Id_Attachment = new List<AttachmentMessage>(),
                         Edited = reader.GetBoolean("Edited"),
                         UserIsSender = reader.GetUInt32("Id_User") == Id_Sender
                     };
                     var attachment = reader["Id_Attachment"];
                     if (attachment != DBNull.Value)
                     {
-                        item.Id_Attachment.Add(Convert.ToUInt32(attachment));
+                        item.Id_Attachment.Add(new AttachmentMessage() {Id_Attachment = Convert.ToUInt32(attachment), Filename = reader.GetString("Filename"), Mime = reader.GetString("Mime") });
                     }
                     messages.Add(new Tuple<uint, SingleMessage>(reader.GetUInt32("Id_User"), item));
                 }
