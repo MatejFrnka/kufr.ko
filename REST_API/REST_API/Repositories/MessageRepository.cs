@@ -55,9 +55,9 @@ namespace REST_API.Repositories
         {
             string sql;
             uint group = GetMessageGroup(Id_Message);
-            sql = "INSERT INTO `messagestate` (select m.Id as Id_Message, 1 as Id_User,0 as Seen from message as m left join messagestate as s on m.Id = s.Id_Message " +
+            sql = "INSERT INTO `messagestate` (select m.Id as Id_Message, @IdUser as Id_User,0 as Seen from message as m left join messagestate as s on m.Id = s.Id_Message and s.Id_User = @IdUser " +
                 "where m.Id_Group = @IdGroup and s.Id_Message is null and m.Id <= @IdMessage)";
-            db.ExecuteNonQuery(sql, new Dictionary<string, object> { { "IdGroup", group }, { "IdMessage", Id_Message } });
+            db.ExecuteNonQuery(sql, new Dictionary<string, object> { { "IdGroup", group }, { "IdMessage", Id_Message }, { "IdUser", Id_Sender } });
 
             if (Seen)
             {
