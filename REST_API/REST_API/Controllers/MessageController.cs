@@ -42,7 +42,7 @@ namespace REST_API.Controllers
             {
                 return new Response() { StatusCode = Models.Enums.StatusCode.FORBIDDEN };
             }
-            if (!groupRepository.FindByIdInfo(sendMessage.Id_Group, Id_User).ReadOnly)
+            if (groupRepository.FindByIdInfo(sendMessage.Id_Group, Id_User).ReadOnly)
             {
                 return new Response() { StatusCode = Models.Enums.StatusCode.FORBIDDEN };
             }
