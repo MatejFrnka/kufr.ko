@@ -19,6 +19,7 @@ namespace REST_API.Controllers
         private DbManager dbManager;
         private UserRepository userRepository;
         private FriendRepository friendRepository;
+        private GroupRepository groupRepository;
         private uint userId;
         
         public FriendController()
@@ -117,14 +118,19 @@ namespace REST_API.Controllers
                 throw;
             }
         }
+        /// <summary>
+        /// Creates new friend request between user that sends this and user specified in the parameter
+        /// </summary>
+        /// <param name="friend">User that you want to send friend request to</param>
+        /// <returns></returns>
         [HttpPost]
-        public Response CreateFriendRequest(uint IdReceiver)
+        public Response CreateFriendRequest(Friend friend)
         {
             userId = ((UserPrincipal)User).DbUser.Id;
             try
             {
                 Response response = new Response();
-                bool insert = friendRepository.CreateRequest(userId, IdReceiver);
+                bool insert = friendRepository.CreateRequest(userId, friend.User_id);
                 if (insert)
                 {
                     response.StatusCode = Models.Enums.StatusCode.OK;
@@ -143,14 +149,53 @@ namespace REST_API.Controllers
                 throw;
             }
         }
+        /// <summary>
+        /// Accepts friend request between user in parameter and user that sends this, creates their default chat group and returns its Id
+        /// </summary>
+        /// <param name="friend">Id of the user that you want accept friendship with</param>
+        /// <returns>Response with Id of the default chat group in Data</returns>
         [HttpPatch]
-        public Response ChangeFriendStatus(uint IdReceiver,FriendRequestState friendStatus)
+        public Response AcceptFriend(Friend friend)
         {
             userId = ((UserPrincipal)User).DbUser.Id;
             try
             {
                 Response response = new Response();
-                bool insert = friendRepository.RespondToRequest(userId,IdReceiver, friendStatus);
+                bool insert = friendRepository.AcceptFriend(friend.User_id,userId);
+                if (insert)
+                {
+                    uint groupId = groupRepository.CreateForTwoUsersWithDefaults(friend.User_id, userId);
+                    response.Data = groupId;
+                    friendRepository.SetDefaultGroup(userId, friend.User_id, groupId);
+                    response.StatusCode = Models.Enums.StatusCode.OK;
+                }
+                else
+                {
+                    response.StatusCode = Models.Enums.StatusCode.INVALID_REQUEST;
+                }
+
+
+                return response;
+            }
+            catch (Exception)
+            {
+                return new Response() { StatusCode = Models.Enums.StatusCode.DATABASE_ERROR };
+                throw;
+            }
+        }
+        /// <summary>
+        /// Changes friedship that your (no longer) friend can't send you another friend request and your coversation with him will become read-only
+        /// </summary>
+        /// <param name="badFriend">Id of the friend that betrayed you</param>
+        /// <returns></returns>
+        [HttpPatch]
+        public Response BlockFriend(Friend badFriend)
+        {
+            userId = ((UserPrincipal)User).DbUser.Id;
+            try
+            {
+                Response response = new Response();
+                bool insert = friendRepository.BlockFriend(userId, badFriend.User_id);
                 if (insert)
                 {
                     response.StatusCode = Models.Enums.StatusCode.OK;
@@ -169,14 +214,20 @@ namespace REST_API.Controllers
                 throw;
             }
         }
+
+        /// <summary>
+        /// Removes friendship between user who sends this and user in the param. (Deletes just the friendship, conversation and both users remain untouched.)
+        /// </summary>
+        /// <param name="IdFriend"></param>
+        /// <returns></returns>
         [HttpDelete]
-        public Response RemoveFriend(uint IdFriend)
+        public Response RemoveFriend(Friend friend)
         {
             userId = ((UserPrincipal)User).DbUser.Id;
             try
             {
                 Response response = new Response();
-                bool delete = friendRepository.DeleteFriend(userId, IdFriend);
+                bool delete = friendRepository.DeleteFriend(userId, friend.User_id);
                 if (delete)
                 {
                     response.StatusCode = Models.Enums.StatusCode.OK;

@@ -42,23 +42,6 @@ namespace REST_API.Repositories
             List<UserPublic> friends = ReadToUserListNotFriends(this.db.ExecuteReader("SELECT f.Id_UserReceiver as Id, u.Name, u.Id_Attachment FROM FriendRequest f INNER JOIN User u ON u.Id = f.Id_UserReceiver WHERE f.Id_UserSender = @userId AND f.State = @state", new Dictionary<string, object>() { { "userId", userId }, { "state", state.ToString() } }));
             return friends;
         }
-        //private List<FriendRequest> ReadToFriendList(MySqlDataReader reader)
-        //{
-        //    List<FriendRequest> result = new List<FriendRequest>();
-        //    while (reader.Read())
-        //    {
-        //        FriendRequest friendRequest = new FriendRequest()
-        //        {
-        //            Id_UserSender = reader.GetUInt32("Id_UserSender"),
-        //            Id_UserReceiver = reader.GetUInt32("Id_UserReceiver"),
-        //            State = (FriendRequestState)Enum.Parse(typeof(FriendRequestState), reader.GetString("State")),
-        //        };
-        //        result.Add(friendRequest);
-        //    }
-
-        //    reader.Close();
-        //    return result;
-        //}
         private List<UserPublic> ReadToUserList(MySqlDataReader reader)
         {
             List<UserPublic> result = new List<UserPublic>();
@@ -95,17 +78,6 @@ namespace REST_API.Repositories
             reader.Close();
             return result;
         }
-        //private List<uint> ReadToIdList(MySqlDataReader reader)
-        //{
-        //    List<uint> result = new List<uint>();
-        //    while (reader.Read())
-        //    {
-        //        result.Add(reader.GetUInt32("FriendId"));
-        //    }
-
-        //    reader.Close();
-        //    return result;
-        //}
         public bool CreateRequest(uint IdFrom,uint IdTo)
         {
             string sql = "INSERT INTO FriendRequest(Id_UserSender, Id_UserReceiver) SELECT @IdFrom, @IdTo FROM User u WHERE u.Id = 51 AND u.Visibility = 'PUBLIC' AND NOT EXISTS (SELECT 1 FROM FriendRequest f INNER JOIN User u ON u.Id = f.Id_UserReceiver INNER JOIN User u2 ON u2.Id = f.Id_UserSender WHERE (f.Id_UserReceiver = @IdFrom AND f.Id_UserSender = @IdTo) OR (f.Id_UserReceiver = @IdTo AND f.Id_UserSender = @IdFrom))";
@@ -120,23 +92,9 @@ namespace REST_API.Repositories
             }
             
         }
-        public bool RespondToRequest(uint IdFrom, uint IdTo,FriendRequestState action)
+        public bool AcceptFriend(uint IdFrom, uint IdTo)
         {
-            string sql = "UPDATE FriendRequest SET State = @state WHERE Id_UserSender = @IdFrom AND Id_UserReceiver = @IdTo";
-
-            if (this.db.ExecuteNonQuery(sql, new Dictionary<string, object>() { { "IdFrom", IdFrom }, { "IdTo", IdTo }, { "state", action.ToString() } }) == 1)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-
-        }
-        public bool DeleteFriend(uint IdFrom, uint IdTo)
-        {
-            string sql = "DELETE FROM FriendRequest WHERE Id_UserSender = @IdFrom AND Id_UserReceiver = @IdTo";
+            string sql = "UPDATE FriendRequest SET State = 'ACCEPTED' WHERE Id_UserSender = @IdFrom AND Id_UserReceiver = @IdTo";
 
             if (this.db.ExecuteNonQuery(sql, new Dictionary<string, object>() { { "IdFrom", IdFrom }, { "IdTo", IdTo } }) == 1)
             {
@@ -148,17 +106,66 @@ namespace REST_API.Repositories
             }
 
         }
-        //public bool IsVisibleTo(uint Id)
-        //{
-        //    if (true)
-        //    {
-        //        return true;
-        //    }
-        //    else
-        // {
-        //        return false;
-        //    }
-        //}
+        public bool SetDefaultGroup(uint IdFrom, uint IdTo, uint IdGroup)
+        {
+            string sql = "UPDATE FriendRequest SET Id_Group = @group WHERE Id_UserSender = @IdFrom AND Id_UserReceiver = @IdTo";
+
+            if (this.db.ExecuteNonQuery(sql, new Dictionary<string, object>() { { "IdFrom", IdFrom }, { "IdTo", IdTo }, { "group", IdGroup } }) == 1)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
+        public bool BlockFriend(uint IdFrom, uint IdTo)
+        {
+            string sql = "UPDATE FriendRequest SET State = 'BLOCKED' WHERE Id_UserSender = @IdTo AND Id_UserReceiver = @IdFrom";
+            if (this.db.ExecuteNonQuery(sql, new Dictionary<string, object>() { { "IdFrom", IdFrom }, { "IdTo", IdTo } }) == 1)
+            {
+                return true;
+            }
+            else
+            {
+                //Vim je to prasárna ale nechtělo se mi psát select kterej by to udělal v jednom takže #ŠibravůvTrychtýř
+                string sql2 = "UPDATE FriendRequest SET Id_UserSender = @IdFrom, Id_UserReceiver = @IdTo, State = 'BLOCKED' WHERE Id_UserSender = @IdTo AND Id_UserReceiver = @IdFrom";
+                if (this.db.ExecuteNonQuery(sql2, new Dictionary<string, object>() { { "IdFrom", IdFrom }, { "IdTo", IdTo } }) == 1)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+        }
+        public bool DeleteFriend(uint IdFrom, uint IdTo)
+        {
+            string sql = "DELETE FROM FriendRequest WHERE Id_UserSender = @IdTo AND Id_UserReceiver = @IdFrom";
+
+            
+            if (this.db.ExecuteNonQuery(sql, new Dictionary<string, object>() { { "IdFrom", IdFrom }, { "IdTo", IdTo } }) == 1)
+            {
+                return true;
+            }
+            else
+            {
+                //Same as above
+                string sql2 = "DELETE FROM FriendRequest WHERE Id_UserSender = @IdFrom AND Id_UserReceiver = @IdTo";
+                if (this.db.ExecuteNonQuery(sql2, new Dictionary<string, object>() { { "IdFrom", IdFrom }, { "IdTo", IdTo } }) == 1)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+        }
         private FriendRequest ReadFriendRequest(MySqlDataReader reader)
         {
             FriendRequest result = new FriendRequest();

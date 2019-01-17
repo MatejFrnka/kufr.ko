@@ -218,6 +218,7 @@
     <Compile Include="Models\Api\Attachments\AttachmentRequest.cs" />
     <Compile Include="Models\Api\Attachments\AttachmentUpload.cs" />
     <Compile Include="Models\Api\Auth\UserCredentials.cs" />
+    <Compile Include="Models\Api\Friend.cs" />
     <Compile Include="Models\Api\Group\GroupDetailInfo.cs" />
     <Compile Include="Models\Api\Group\GroupInfo.cs" />
     <Compile Include="Models\Api\Group\Group_UserInfo.cs" />
