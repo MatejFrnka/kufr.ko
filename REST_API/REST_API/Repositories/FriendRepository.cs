@@ -106,6 +106,20 @@ namespace REST_API.Repositories
             }
 
         }
+        public bool SetDefaultGroup(uint IdFrom, uint IdTo, uint IdGroup)
+        {
+            string sql = "UPDATE FriendRequest SET Id_Group = @group WHERE Id_UserSender = @IdFrom AND Id_UserReceiver = @IdTo";
+
+            if (this.db.ExecuteNonQuery(sql, new Dictionary<string, object>() { { "IdFrom", IdFrom }, { "IdTo", IdTo }, { "group", IdGroup } }) == 1)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
         public bool BlockFriend(uint IdFrom, uint IdTo)
         {
             string sql = "UPDATE FriendRequest SET State = 'BLOCKED' WHERE Id_UserSender = @IdTo AND Id_UserReceiver = @IdFrom";

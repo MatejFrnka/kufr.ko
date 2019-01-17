@@ -164,7 +164,9 @@ namespace REST_API.Controllers
                 bool insert = friendRepository.AcceptFriend(friend.User_id,userId);
                 if (insert)
                 {
-                    response.Data = groupRepository.CreateForTwoUsersWithDefaults(friend.User_id, userId);
+                    uint groupId = groupRepository.CreateForTwoUsersWithDefaults(friend.User_id, userId);
+                    response.Data = groupId;
+                    friendRepository.SetDefaultGroup(userId, friend.User_id, groupId);
                     response.StatusCode = Models.Enums.StatusCode.OK;
                 }
                 else
