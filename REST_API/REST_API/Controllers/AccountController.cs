@@ -21,8 +21,8 @@ namespace REST_API.Controllers
             var dbm = new Utilities.DbManager();
             repository = new UserRepository(dbm);
         }
-        [HttpPost]
-        public Response EditProfilePicture([FromBody]uint Id_Attachment)
+        [HttpGet]
+        public Response EditProfilePicture(uint Id_Attachment)
         {
             try
             {
@@ -38,8 +38,8 @@ namespace REST_API.Controllers
             }
 
         }
-        [HttpPost]
-        public Response UpdateVisibility([FromBody]Visibility visibility)
+        [HttpGet]
+        public Response UpdateVisibility(Visibility visibility)
         {
             try
             {
@@ -55,6 +55,28 @@ namespace REST_API.Controllers
 
             }
         }
+        [HttpGet]
+        public Response UpdateUsername(string username)
+        {
+            try
+            {
+                uint Id_User = ((UserPrincipal)User).DbUser.Id;
+                User user = repository.FindById(Id_User);
+                if (string.IsNullOrEmpty(username))
+                {
+                    return new Response() { StatusCode = Models.Enums.StatusCode.INVALID_REQUEST };
+                }
+                user.Name = username;
+                repository.Update(user);
+                return new Response() { StatusCode = Models.Enums.StatusCode.OK };
+            }
+            catch (MySql.Data.MySqlClient.MySqlException ex)
+            {
+                return new Response() { StatusCode = Models.Enums.StatusCode.DATABASE_ERROR };
+
+            }
+        }
+
         [HttpGet]
         public Response GetSelf()
         {
