@@ -3,6 +3,7 @@ using REST_API.Models.Api;
 using REST_API.Models.Database;
 using REST_API.Models.Enums;
 using REST_API.Repositories;
+using REST_API.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,6 +38,27 @@ namespace REST_API.Controllers
                 return new Response() { StatusCode = Models.Enums.StatusCode.DATABASE_ERROR };
             }
 
+        }
+        [HttpGet]
+        public Response EditPassword(string password)
+        {
+            
+            if (string.IsNullOrEmpty(password))
+            {
+                return new Response() { StatusCode = Models.Enums.StatusCode.INVALID_REQUEST };
+            }
+            try
+            {
+                uint Id_User = ((UserPrincipal)User).DbUser.Id;
+                User user = repository.FindById(Id_User);
+                user.Password = HashUtility.HashPassword(password);
+                repository.Update(user);
+                return new Response() { StatusCode = Models.Enums.StatusCode.OK };
+            }
+            catch (MySql.Data.MySqlClient.MySqlException)
+            {
+                return new Response() { StatusCode = Models.Enums.StatusCode.DATABASE_ERROR };
+            }
         }
         [HttpGet]
         public Response UpdateVisibility(Visibility visibility)
