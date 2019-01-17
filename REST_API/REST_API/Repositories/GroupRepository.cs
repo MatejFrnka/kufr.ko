@@ -47,15 +47,9 @@ namespace REST_API.Repositories
 
         public uint CreateForUserWithDefaults(uint userId)
         {
-            string sql = "INSERT INTO `Group`(HistoryVisibility) VALUES (0); SELECT LAST_INSERT_ID();";
+            string sql = "INSERT INTO `Group`(HistoryVisibility) VALUES (0); INSERT INTO Group_User(Id_User, Id_Group, Permission) SELECT @uid,LAST_INSERT_ID(),'OWNER'";
 
-            uint gId = Convert.ToUInt32(this.db.ExecuteScalar(sql, new Dictionary<string, object>()));
-
-            string sql2 = "INSERT INTO Group_User(Id_User, Id_Group, Permission) VALUES (@uid,@gid,'OWNER')";
-
-            this.db.ExecuteNonQuery(sql2, new Dictionary<string, object>() { { "uid", userId },{ "gid", gId } });
-
-            return gId;
+            return Convert.ToUInt32(this.db.ExecuteScalar(sql, new Dictionary<string, object>() { { "uid", userId } }));
         }
 
         private List<GroupDetailInfo> ReadToListGroupDetailInfo(MySqlDataReader reader)
