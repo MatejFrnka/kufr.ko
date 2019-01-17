@@ -22,7 +22,7 @@ namespace REST_API.Controllers
         private UserRepository userRepository;
         private AttachmentRepository attachmentRepository;
         private uint userId;
-        private const string path = @"\attachdb\";
+        private const string path = @"";
 
         public FileController()
         {
@@ -97,25 +97,24 @@ namespace REST_API.Controllers
         //}
 
         [HttpPost]
-        
-        public Response SaveAttachment(string attachment)
+        public Response SaveAttachment(AttachmentData attachment)
         {
             Response response = new Response();
             try
             {
-                byte[] bytes = Convert.FromBase64String(attachment);
+                byte[] bytes = Convert.FromBase64String(attachment.Data);
                 var md5 = HashAlgorithm.Create();
                 string hash = BitConverter.ToString(md5.ComputeHash(bytes)).Replace("-", "").ToLowerInvariant();
                 uint? id = attachmentRepository.FindIdByHash(hash);
-                if (id!=null)
-                {
-                    response.Data = id;
-                }
-                else
+                if (id==null)
                 {
                     id = attachmentRepository.CreateAttachment(hash);
                     response.Data = id;
-                    File.WriteAllBytes(path+id.ToString(), bytes);
+                    File.WriteAllBytes(path + id.ToString(), bytes);
+                }
+                else
+                {
+                    response.Data = id;
                 }
                 
                 response.StatusCode = Models.Enums.StatusCode.OK;
@@ -127,15 +126,13 @@ namespace REST_API.Controllers
             return response;
         }
 
-        [HttpGet]
-
-
 
         /// <summary>
         /// Checks if attachment already exists in the database
         /// </summary>
         /// <param name="hash">MD5 Hash of the attachment</param>
         /// <returns>Response with ID of the attachment if attachment exists, otherwise null</returns>
+        [HttpGet]
         public Response AttachmentExists(string hash)
         {
             Response response = new Response();
