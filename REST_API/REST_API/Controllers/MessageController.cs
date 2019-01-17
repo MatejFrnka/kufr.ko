@@ -20,10 +20,18 @@ namespace REST_API.Controllers
     public class MessageController : ApiController
     {
 
-        MessageRepository repository = new MessageRepository(new DbManager());
-        UserRepository userRepository = new UserRepository(new DbManager());
-        GroupRepository groupRepository = new GroupRepository(new DbManager());
-        AttachmentRepository attachmentRepository = new AttachmentRepository(new DbManager());
+        MessageRepository repository;
+        UserRepository userRepository;
+        GroupRepository groupRepository;
+        AttachmentRepository attachmentRepository;
+        public MessageController()
+        {
+            DbManager dbManager = new DbManager();
+            repository = new MessageRepository(dbManager);
+            userRepository = new UserRepository(dbManager);
+            groupRepository = new GroupRepository(dbManager);
+            attachmentRepository = new AttachmentRepository(dbManager);
+        }
         /// <summary>
         /// Adds a message to target group.
         /// </summary>
@@ -165,6 +173,21 @@ namespace REST_API.Controllers
                 }
             }
             List<SingleMessage> result = repository.GetNewMessages(getNewMessages.Id_Last, getNewMessages.Groups, Id_User);
+            if (result.Count != 0)
+                this.repository.SetMessageState(Id_User, result.Last().Id, false);
+            return new Response() { StatusCode = Models.Enums.StatusCode.OK, Data = result };
+        }
+        [HttpGet]
+        public Response GetNewMessagesByDate(DateTime LastUpdated)
+        {
+            uint Id_User = ((UserPrincipal)User).DbUser.Id;
+            if (LastUpdated == null)
+            {
+                return new Response() { StatusCode = Models.Enums.StatusCode.INVALID_REQUEST };
+            }
+            List<uint> groups = new List<uint>();
+            userRepository.GetGroups(Id_User).ForEach((a) => groups.Add(a.Id_Group));
+            List<SingleMessage> result = repository.GetNewMessages(LastUpdated, groups, Id_User);
             if (result.Count != 0)
                 this.repository.SetMessageState(Id_User, result.Last().Id, false);
             return new Response() { StatusCode = Models.Enums.StatusCode.OK, Data = result };

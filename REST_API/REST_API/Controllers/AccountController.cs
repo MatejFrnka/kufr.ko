@@ -118,10 +118,9 @@ namespace REST_API.Controllers
         public Response DeleteSelf()
         {
             uint Id_User = ((UserPrincipal)User).DbUser.Id;
-            repository.Delete(Id_User);
             try
             {
-                
+                repository.Delete(Id_User);
             }
             catch (MySql.Data.MySqlClient.MySqlException)
             {

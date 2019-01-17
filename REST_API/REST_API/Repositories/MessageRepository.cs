@@ -120,8 +120,8 @@ namespace REST_API.Repositories
             }
             string sql = "SELECT * FROM `Message` " +
                 "LEFT JOIN `Message_Attachment` ON Message.Id = Message_Attachment.Id_Message " +
-                "WHERE `Sent` >= @OldestDate and (" + groups + ") ";
-            return ReadToSingleMessage(db.ExecuteReader(sql, new Dictionary<string, object>() { { "OldestDate", OldestMessage } }), Id_Sender);
+                "WHERE `Sent` >= '"+OldestMessage.ToString("yyyy-MM-ddTHH:mm:ssK")+"' and (" + groups + ") ";
+            return ReadToSingleMessage(db.ExecuteReader(sql, new Dictionary<string, object>() { }), Id_Sender);
         }
         public List<SingleMessage> GetNewMessages(ulong Id_Last, List<uint> FromGroups, uint Id_Sender)
         {

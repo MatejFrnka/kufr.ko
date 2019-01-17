@@ -225,6 +225,7 @@
     <Compile Include="Models\Api\Message\EditMessage.cs" />
     <Compile Include="Models\Api\Message\GetMessage.cs" />
     <Compile Include="Models\Api\Message\GetNewMessages.cs" />
+    <Compile Include="Models\Api\Message\GetNewMessagesByDate.cs" />
     <Compile Include="Models\Api\Message\SetMessageState.cs" />
     <Compile Include="Models\Api\Message\SingleMessage.cs" />
     <Compile Include="Models\Api\Message\SendMessage.cs" />
