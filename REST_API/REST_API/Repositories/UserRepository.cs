@@ -20,7 +20,7 @@ namespace REST_API.Repositories
         }
         public void Delete(uint id)
         {
-            string sql = "DELETE FROM `user` WHERE `Id` = @Id_User";
+            string sql = "UPDATE `user` SET `Deleted` = 1, `Visibility` = 1  WHERE `Id` = @Id_User";
 
             db.ExecuteNonQuery(sql, new Dictionary<string, object>() { {"Id_User", id} });
         }
@@ -82,7 +82,8 @@ namespace REST_API.Repositories
                     Created = reader.GetDateTime("Created"),
                     LastOnline = reader.IsDBNull(reader.GetOrdinal("LastOnline")) ? (DateTime?)null : reader.GetDateTime("LastOnline"),
                     Visibility = (Visibility)Enum.Parse(typeof(Visibility), reader.GetString("Visibility")),
-                    Id_Attachment = reader.GetUInt32("Id_Attachment")
+                    Id_Attachment = reader.GetUInt32("Id_Attachment"),
+                    Deleted = reader.GetBoolean("Deleted")
                 };
 
                 result.Add(user);

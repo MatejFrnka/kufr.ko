@@ -49,9 +49,11 @@ namespace REST_API.Controllers
             {
                 return new Response() { StatusCode = Models.Enums.StatusCode.DATABASE_ERROR };
             }
-            
 
             if (dbUser == null)
+                return new Response() { StatusCode = Models.Enums.StatusCode.INVALID_EMAIL };
+
+            if (dbUser.Deleted)
                 return new Response() { StatusCode = Models.Enums.StatusCode.INVALID_EMAIL };
 
             if (!HashUtility.VerifyPassword(user.Password, dbUser.Password))

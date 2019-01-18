@@ -16,5 +16,6 @@ namespace REST_API.Models.Database
         public DateTime? LastOnline { get; set; }
         public Visibility Visibility { get; set; }
         public uint Id_Attachment { get; set; }
+        public bool Deleted { get; set; }
     }
 }
