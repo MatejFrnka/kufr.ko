@@ -174,51 +174,6 @@ namespace REST_API.Controllers
         //        }
         //    }
         //}
-        private static string GetMime(string filename)
-        {
-            if (filename.Contains('.'))
-            {
-                if (filename.EndsWith("jpg"))
-                {
-                    return "image/jpg";
-                }
-                else if (filename.EndsWith("jpeg"))
-                {
-                    return "image/jpeg";
-                }
-                else if (filename.EndsWith("png"))
-                {
-                    return "image/png";
-                }
-                else if (filename.EndsWith("gif"))
-                {
-                    return "image/gif";
-                }
-                else if (filename.EndsWith("bmp"))
-                {
-                    return "image/bmp";
-                }
-                else if (filename.EndsWith("avi"))
-                {
-                    return "video/x-msvideo";
-                }
-                else if (filename.EndsWith("mp3"))
-                {
-                    return "audio/mpeg";
-                }
-                else if (filename.EndsWith("txt"))
-                {
-                    return "text/plain";
-                }
-                else
-                {
-                    return "application/unknown";
-                }
-            }
-            else
-            {
-                return "application/octet-stream";
-            }
-        }
+        
     }
 }
