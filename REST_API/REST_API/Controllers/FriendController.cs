@@ -27,6 +27,7 @@ namespace REST_API.Controllers
             this.dbManager = new DbManager();
             this.userRepository = new UserRepository(this.dbManager);
             this.friendRepository = new FriendRepository(this.dbManager);
+            this.groupRepository = new GroupRepository(this.dbManager);
         }
         [HttpGet]
         public Response LoadExistingFriends()
