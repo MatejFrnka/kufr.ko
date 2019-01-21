@@ -130,7 +130,7 @@ namespace REST_API.Repositories
             else
             {
                 //Vim je to prasárna ale nechtělo se mi psát select kterej by to udělal v jednom takže #ŠibravůvTrychtýř
-                string sql2 = "UPDATE FriendRequest SET Id_UserSender = @IdFrom, Id_UserReceiver = @IdTo, State = 'BLOCKED' WHERE Id_UserSender = @IdTo AND Id_UserReceiver = @IdFrom";
+                string sql2 = "UPDATE FriendRequest SET Id_UserSender = @IdTo, Id_UserReceiver = @IdFrom, State = 'BLOCKED' WHERE Id_UserSender = @IdFrom AND Id_UserReceiver = @IdTo";
                 if (this.db.ExecuteNonQuery(sql2, new Dictionary<string, object>() { { "IdFrom", IdFrom }, { "IdTo", IdTo } }) == 1)
                 {
                     return true;
