@@ -48,7 +48,7 @@ namespace REST_API.Repositories
 
                 foreach (var Attachment in Attachments)
                 {
-                    db.ExecuteNonQuery(sql, new Dictionary<string, object>() { { "Id_Message", Id_Message }, { "Id_Attachment", Attachment }, { "Filename", Attachment.Filename }, { "Mime", Attachment.Mime } });
+                    db.ExecuteNonQuery(sql, new Dictionary<string, object>() { { "Id_Message", Id_Message }, { "Id_Attachment", Attachment.Id_Attachment }, { "Filename", Attachment.Filename }, { "Mime", Attachment.Mime } });
                 }
             }
         }
