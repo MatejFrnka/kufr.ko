@@ -205,8 +205,6 @@ namespace REST_API.Controllers
             {
                 return new Response() { StatusCode = Models.Enums.StatusCode.INVALID_REQUEST };
             }
-            if (repository.FindById(Id_Message).Id_User != Id_User)
-                return new Response() { StatusCode = Models.Enums.StatusCode.FORBIDDEN };
             repository.SetMessageState(Id_User, Id_Message, Seen);
             return new Response() { StatusCode = Models.Enums.StatusCode.OK };
         }
