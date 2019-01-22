@@ -22,7 +22,7 @@ namespace REST_API.Controllers
         private UserRepository userRepository;
         private AttachmentRepository attachmentRepository;
         private uint userId;
-        private const string path = @"";
+        private const string path = @"x:\PRG\KuFr.Ko\files\";
 
         public FileController()
         {
@@ -104,14 +104,14 @@ namespace REST_API.Controllers
             try
             {
                 byte[] bytes = Convert.FromBase64String(attachment.Data);
-                var md5 = HashAlgorithm.Create();
-                string hash = BitConverter.ToString(md5.ComputeHash(bytes)).Replace("-", "").ToLowerInvariant();
+                MD5CryptoServiceProvider md5provider = new MD5CryptoServiceProvider();
+                string hash = BitConverter.ToString(md5provider.ComputeHash(bytes)).Replace("-", "").ToLowerInvariant();
                 uint? id = attachmentRepository.FindIdByHash(hash);
                 if (id==null)
                 {
                     id = attachmentRepository.CreateAttachment(hash);
                     response.Data = id;
-                    File.WriteAllBytes(path + id.ToString(), bytes);
+                    File.WriteAllBytes(path + id.ToString()+".dat", bytes);
                 }
                 else
                 {
@@ -122,6 +122,7 @@ namespace REST_API.Controllers
             }
             catch (Exception)
             {
+                throw;
                 response.StatusCode = Models.Enums.StatusCode.DATABASE_ERROR;
             }
             return response;
