@@ -221,7 +221,7 @@ namespace REST_API.Controllers
         /// </summary>
         /// <param name="IdFriend"></param>
         /// <returns></returns>
-        [HttpDelete]
+        [HttpPatch]
         public Response RemoveFriend(Friend friend)
         {
             userId = ((UserPrincipal)User).DbUser.Id;
