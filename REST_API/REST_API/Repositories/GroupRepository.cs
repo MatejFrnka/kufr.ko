@@ -59,7 +59,7 @@ namespace REST_API.Repositories
         }
         public uint CreateForTwoUsersWithDefaults(uint userId, uint userId2)
         {
-            string sql = "INSERT INTO 'Group' (HistoryVisibility) VALUES (0); SELECT LAST_INSERT_ID();";
+            string sql = "INSERT INTO `Group` (HistoryVisibility) VALUES (0); SELECT LAST_INSERT_ID();";
 
             uint gId = Convert.ToUInt32(this.db.ExecuteScalar(sql, new Dictionary<string, object>()));
 
