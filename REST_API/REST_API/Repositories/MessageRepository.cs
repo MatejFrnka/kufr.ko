@@ -40,15 +40,15 @@ namespace REST_API.Repositories
 
             return Id_Message;
         }
-        public void AddAttachments(List<uint> Attachments, ulong Id_Message)
+        public void AddAttachments(List<AttachmentMessage> Attachments, ulong Id_Message)
         {
             if (Attachments != null)
             {
-                string sql = "INSERT INTO `Message_Attachment`(`Id_Message`, `Id_Attachment`) VALUES (@Id_Message, @Id_Attachment);";
+                string sql = "INSERT INTO `Message_Attachment`(`Id_Message`, `Id_Attachment`,`Filename`,`Mime`) VALUES (@Id_Message, @Id_Attachment, @Filename, @Mime);";
 
                 foreach (var Attachment in Attachments)
                 {
-                    db.ExecuteNonQuery(sql, new Dictionary<string, object>() { { "Id_Message", Id_Message }, { "Id_Attachment", Attachment } });
+                    db.ExecuteNonQuery(sql, new Dictionary<string, object>() { { "Id_Message", Id_Message }, { "Id_Attachment", Attachment }, { "Filename", Attachment.Filename }, { "Mime", Attachment.Mime } });
                 }
             }
         }
