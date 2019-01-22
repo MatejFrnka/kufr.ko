@@ -53,14 +53,14 @@ namespace REST_API.Controllers
             try
             {
                 Response response = new Response();
-                Attachment attachment = attachmentRepository.FindById(IdAttachment, userId);
-                if (attachment == null)
+                //Attachment attachment = attachmentRepository.FindById(IdAttachment, userId);
+                if (attachmentRepository.FindById(IdAttachment, userId)==null)
                 {
                     response.StatusCode = Models.Enums.StatusCode.INVALID_REQUEST;
                 }
                 else
                 {
-                    string attachmentFullPath = path + IdAttachment;
+                    string attachmentFullPath = path + IdAttachment+".dat";
                     if (File.Exists(attachmentFullPath))
                     {
                         response.Data = LoadFile(attachmentFullPath);

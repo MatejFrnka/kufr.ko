@@ -34,11 +34,11 @@ namespace REST_API.Repositories
 
             return this.ReadToObject(db.ExecuteReader(sql, new Dictionary<string, object>() { { "Id_Attachment", Id_Attachment }, { "Id_User", Id_User } }), Id_Attachment); 
         }
-        public Attachment FindById(uint Id_Attachment, uint Id_User)
+        public string FindById(uint Id_Attachment, uint Id_User)
         {
-            string sql = "SELECT a.Hash FROM Attachment a WHERE a.Id = @Id_Attachment";
+            string sql = "SELECT Hash FROM Attachment WHERE Id = @Id_Attachment";
 
-            return this.ReadToObject(db.ExecuteReader(sql, new Dictionary<string, object>() { { "Id_Attachment", Id_Attachment } }), Id_Attachment);
+            return (string)db.ExecuteScalar(sql, new Dictionary<string, object>() { { "Id_Attachment", Id_Attachment } });
         }
         public uint? FindIdByHash(string Hash)
         {
