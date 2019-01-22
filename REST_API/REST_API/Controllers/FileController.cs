@@ -53,7 +53,7 @@ namespace REST_API.Controllers
             try
             {
                 Response response = new Response();
-                Attachment attachment = attachmentRepository.FindByIdSecure(IdAttachment, userId);
+                Attachment attachment = attachmentRepository.FindById(IdAttachment, userId);
                 if (attachment == null)
                 {
                     response.StatusCode = Models.Enums.StatusCode.INVALID_REQUEST;

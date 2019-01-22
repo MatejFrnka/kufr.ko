@@ -32,7 +32,13 @@ namespace REST_API.Repositories
         {
             string sql = "SELECT a.Hash FROM Attachment a INNER JOIN Message_Attachment ma on ma.Id_Attachment = a.Id INNER JOIN Message m on ma.Id_Message = m.Id INNER JOIN Group_User gu on gu.Id_Group = m.Id_Group WHERE a.Id = @Id_Attachment AND gu.Id_User = @Id_User";
 
-            return this.ReadToObject(db.ExecuteReader(sql, new Dictionary<string, object>() { { "Id_Attachment", Id_Attachment }, { "Id_User", Id_User } }),Id_Attachment);
+            return this.ReadToObject(db.ExecuteReader(sql, new Dictionary<string, object>() { { "Id_Attachment", Id_Attachment }, { "Id_User", Id_User } }), Id_Attachment); 
+        }
+        public Attachment FindById(uint Id_Attachment, uint Id_User)
+        {
+            string sql = "SELECT a.Hash FROM Attachment a WHERE a.Id = @Id_Attachment";
+
+            return this.ReadToObject(db.ExecuteReader(sql, new Dictionary<string, object>() { { "Id_Attachment", Id_Attachment } }), Id_Attachment);
         }
         public uint? FindIdByHash(string Hash)
         {
