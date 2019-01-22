@@ -167,7 +167,7 @@ namespace REST_API.Controllers
                 {
                     uint groupId = groupRepository.CreateForTwoUsersWithDefaults(friend.User_id, userId);
                     response.Data = groupId;
-                    friendRepository.SetDefaultGroup(userId, friend.User_id, groupId);
+                    friendRepository.SetDefaultGroup(friend.User_id,userId, groupId);
                     response.StatusCode = Models.Enums.StatusCode.OK;
                 }
                 else

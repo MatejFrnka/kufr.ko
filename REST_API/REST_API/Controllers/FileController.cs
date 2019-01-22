@@ -23,6 +23,7 @@ namespace REST_API.Controllers
         private AttachmentRepository attachmentRepository;
         private uint userId;
         private const string path = @"x:\PRG\KuFr.Ko\files\";
+        //private const string path = @"";
 
         public FileController()
         {

@@ -24,7 +24,7 @@ namespace REST_API.Repositories
         }
         public List<UserPublic> FindAcceptedFriends(uint userId)
         {
-            List<UserPublic> friends = ReadToUserList(this.db.ExecuteReader("SELECT f.Id_UserSender as Id, u.Name, u.Id_Attachment, u.LastOnline FROM FriendRequest f INNER JOIN User u ON u.Id = f.Id_UserSender WHERE f.Id_UserReceiver = @userId AND f.State='ACCEPTED' UNION SELECT f.Id_UserReceiver as Id, u.Name, u.Id_Attachment, u.LastOnline FROM FriendRequest f INNER JOIN User u ON u.Id = f.Id_UserReceiver WHERE f.Id_UserSender = @userId AND f.State='ACCEPTED'", new Dictionary<string, object>() { { "userId", userId }}));
+            List<UserPublic> friends = ReadToUserList(this.db.ExecuteReader("SELECT f.Id_UserSender as Id, u.Name, u.Id_Attachment, u.LastOnline, f.Id_Group FROM FriendRequest f INNER JOIN User u ON u.Id = f.Id_UserSender WHERE f.Id_UserReceiver = @userId AND f.State='ACCEPTED' UNION SELECT f.Id_UserReceiver as Id, u.Name, u.Id_Attachment, u.LastOnline, f.Id_Group FROM FriendRequest f INNER JOIN User u ON u.Id = f.Id_UserReceiver WHERE f.Id_UserSender = @userId AND f.State='ACCEPTED'", new Dictionary<string, object>() { { "userId", userId }}));
             return friends;
         }
         public List<UserPublic> SearchPossibleFriends(uint userId, string fulltext)
@@ -52,8 +52,8 @@ namespace REST_API.Repositories
                     Id = reader.GetUInt32("Id"),
                     Name = reader.GetString("Name"),
                     Id_Attachment = reader.GetUInt32("Id_Attachment"),
-                    LastOnline = reader.IsDBNull(reader.GetOrdinal("LastOnline")) ? (DateTime?) null : reader.GetDateTime("LastOnline")
-                    //,DefaultGroup = reader.IsDBNull(reader.GetInt32("GroupId")) ? (uint?)null : reader.GetUInt32("GroupId")
+                    LastOnline = reader.IsDBNull(reader.GetOrdinal("LastOnline")) ? (DateTime?) null : reader.GetDateTime("LastOnline"),
+                    DefaultGroup = reader.IsDBNull(reader.GetOrdinal("Id_Group")) ? (uint?)null : reader.GetUInt32("Id_Group")
                 };
                 result.Add(u);
             }
