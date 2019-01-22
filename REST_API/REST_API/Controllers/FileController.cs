@@ -29,7 +29,6 @@ namespace REST_API.Controllers
             this.dbManager = new DbManager();
             this.userRepository = new UserRepository(this.dbManager);
             this.attachmentRepository = new AttachmentRepository(this.dbManager);
-            userId = ((UserPrincipal)User).DbUser.Id;
         }
 
 
@@ -50,6 +49,7 @@ namespace REST_API.Controllers
         [HttpGet]
         public Response LoadAttachment(uint IdAttachment)
         {
+            userId = ((UserPrincipal)User).DbUser.Id;
             try
             {
                 Response response = new Response();
@@ -99,6 +99,7 @@ namespace REST_API.Controllers
         [HttpPost]
         public Response SaveAttachment(AttachmentUpload attachment)
         {
+            userId = ((UserPrincipal)User).DbUser.Id;
             Response response = new Response();
             try
             {
@@ -135,6 +136,7 @@ namespace REST_API.Controllers
         [HttpGet]
         public Response AttachmentExists(string hash)
         {
+            userId = ((UserPrincipal)User).DbUser.Id;
             Response response = new Response();
             try
             {

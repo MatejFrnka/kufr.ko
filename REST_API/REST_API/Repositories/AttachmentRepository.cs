@@ -34,17 +34,17 @@ namespace REST_API.Repositories
 
             return this.ReadToObject(db.ExecuteReader(sql, new Dictionary<string, object>() { { "Id_Attachment", Id_Attachment }, { "Id_User", Id_User } }),Id_Attachment);
         }
-        public uint FindIdByHash(string Hash)
+        public uint? FindIdByHash(string Hash)
         {
             string sql = "SELECT Id FROM Attachment WHERE Hash = @Hash";
 
-            return (uint)db.ExecuteScalar(sql, new Dictionary<string, object>() { { "Hash", Hash } });
+            return (uint?)db.ExecuteScalar(sql, new Dictionary<string, object>() { { "Hash", Hash } });
         }
         public uint CreateAttachment(string hash)
         {
-            string sql = "INSERT INTO Attachment(Hash) @hash; SELECT SCOPE_IDENTITY()";
+            string sql = "INSERT INTO Attachment(Hash) VALUES (@hash); SELECT LAST_INSERT_ID();";
 
-            return (uint)this.db.ExecuteScalar(sql, new Dictionary<string, object>() { { "hash", hash } });
+            return Convert.ToUInt32(this.db.ExecuteScalar(sql, new Dictionary<string, object>() { { "hash", hash } }));
 
         }
         
