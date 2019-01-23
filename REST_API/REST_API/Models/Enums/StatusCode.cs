@@ -14,6 +14,7 @@
         EMPTY_PASSWORD,
         EMPTY_NAME,
         EMAIL_ALREADY_EXISTS,
-        FORBIDDEN
+        FORBIDDEN,
+        FAIC
     }
 }

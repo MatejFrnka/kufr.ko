@@ -88,6 +88,12 @@ namespace REST_API.Controllers
             if (String.IsNullOrWhiteSpace(user.Password))
                 return new Response() { StatusCode = Models.Enums.StatusCode.EMPTY_PASSWORD };
 
+
+
+
+            if (user.Name.ToLower().Contains("faic")||user.Email.ToLower().Contains("faic"))
+                return new Response() { StatusCode = Models.Enums.StatusCode.FAIC };
+
             User dbUser = new User() { Name = user.Name, Email = user.Email, Password = HashUtility.HashPassword(user.Password) };
 
             try
